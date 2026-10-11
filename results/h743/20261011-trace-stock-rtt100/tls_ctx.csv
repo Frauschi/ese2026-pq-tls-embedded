@@ -1,0 +1,2 @@
+platform,chain,kex,auth,dut_role,status,heap_peak,heap_held,setup_ns
+h743-fpu,mldsa44,mlkem768,server,server,0,23254,13245,579623

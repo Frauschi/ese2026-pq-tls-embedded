@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite it as below."
+title: "Post-Quantum TLS on Embedded Devices: measurement artifact"
+abstract: "Code, build configurations, patches, raw measurements, packet captures and figure scripts behind the ESE Kongress 2026 paper 'Post-Quantum TLS on Embedded Devices: What It Costs', which measures ML-KEM, ML-DSA, Falcon, SLH-DSA, LMS and XMSS in wolfSSL's TLS 1.3 on an NXP FRDM-RW612, an ST NUCLEO-H743ZI, a Raspberry Pi 3B+ and a Raspberry Pi 5."
+authors:
+  - family-names: "Frauenschläger"
+    given-names: "Tobias"
+    affiliation: "wolfSSL Inc."
+license: GPL-3.0-or-later
+repository-code: "https://github.com/Frauschi/ese2026-pq-tls-embedded"
+keywords:
+  - post-quantum cryptography
+  - TLS 1.3
+  - embedded systems
+  - Zephyr
+  - wolfSSL
+  - ML-KEM
+  - ML-DSA
+  - SLH-DSA
+  - LMS
+  - XMSS

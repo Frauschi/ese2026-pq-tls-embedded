@@ -1,0 +1,20 @@
+choice ESE_PQC_PROFILE
+	prompt "PQC memory and speed profile"
+	default ESE_PQC_SMALLMEM
+
+config ESE_PQC_SMALLMEM
+	bool "smallmem"
+
+config ESE_PQC_DEFAULT
+	bool "default"
+
+config ESE_PQC_SMALLMEM_FAST
+	bool "smallmem-fast"
+
+config ESE_PQC_CACHE
+	bool "cache"
+
+config ESE_PQC_SMALL
+	bool "small"
+
+endchoice

@@ -1,0 +1,3 @@
+platform,chain,kex,auth,dut_role,status,heap_peak,heap_held,setup_ns
+h743-fpu-iw10,mldsa44,mlkem768,server,client,0,6429,2270,174025
+h743-fpu-iw10,mldsa44,mlkem768,mutual,client,0,23254,14693,659412

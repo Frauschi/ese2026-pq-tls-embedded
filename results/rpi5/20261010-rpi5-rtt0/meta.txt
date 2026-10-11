@@ -1,0 +1,40 @@
+date=Sat Oct 10 20:36:43 2026
+label=rpi5
+dut_ip=192.168.0.5
+host_ip=192.168.0.1
+dut_hello=OK platform=rpi5 wolfssl=5.9.4 cpu_hz=2400000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2072 falcon_fpr=neon hw_crypto=1 trace=0 pqc_profile=default tcp_ca=os
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=100 heap_trace=0 host_port=4405 rtt_ms=0 group_msgs=0
+
+date=Sat Oct 10 20:36:54 2026
+label=rpi5
+dut_ip=192.168.0.5
+host_ip=192.168.0.1
+dut_hello=OK platform=rpi5 wolfssl=5.9.4 cpu_hz=2400000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2072 falcon_fpr=neon hw_crypto=1 trace=0 pqc_profile=default tcp_ca=os
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=100 heap_trace=0 host_port=4405 rtt_ms=0 group_msgs=0
+
+date=Sat Oct 10 20:36:59 2026
+label=rpi5
+dut_ip=192.168.0.5
+host_ip=192.168.0.1
+dut_hello=OK platform=rpi5 wolfssl=5.9.4 cpu_hz=2400000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2072 falcon_fpr=neon hw_crypto=1 trace=0 pqc_profile=default tcp_ca=os
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=10 heap_trace=0 host_port=4405 rtt_ms=0 group_msgs=0
+
+date=Sat Oct 10 20:37:05 2026
+label=rpi5
+dut_ip=192.168.0.5
+host_ip=192.168.0.1
+dut_hello=OK platform=rpi5 wolfssl=5.9.4 cpu_hz=2400000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2072 falcon_fpr=neon hw_crypto=1 trace=0 pqc_profile=default tcp_ca=os
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=10 heap_trace=0 host_port=4405 rtt_ms=0 group_msgs=0
+

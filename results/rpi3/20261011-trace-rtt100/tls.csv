@@ -1,0 +1,4 @@
+platform,chain,ca_alg,leaf_alg,kex,auth,dut_role,iter,n,dut_status,host_status,ttfb_ns,tcp_ns,client_hs_ns,server_hs_ns,server_total_ns,c2s_bytes,s2c_bytes,dut_heap_peak,dut_heap_total,dut_heap_allocs,dut_stack
+rpi3,mldsa44,mldsa44,mldsa44,mlkem768,server,server,0,3,0,0,402978084,100470125,302391334,201521145,201582395,1494,12293,63489,90518,36,2512
+rpi3,mldsa44,mldsa44,mldsa44,mlkem768,server,server,1,3,0,0,403051375,100660125,302474917,201499270,201571197,1494,12293,63489,90518,36,2512
+rpi3,mldsa44,mldsa44,mldsa44,mlkem768,server,server,2,3,0,0,403130834,100589459,302505459,201540000,201614270,1494,12293,63489,90518,36,2512

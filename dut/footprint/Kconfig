@@ -1,0 +1,6 @@
+config ESE_FOOTPRINT
+	def_bool y
+
+rsource "../zephyr/Kconfig.pqc"
+
+source "Kconfig.zephyr"

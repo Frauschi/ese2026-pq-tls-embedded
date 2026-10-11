@@ -1,0 +1,30 @@
+date=Sat Oct 10 20:16:24 2026
+label=h743-fpu-int
+dut_ip=192.168.0.3
+host_ip=192.168.0.1
+dut_hello=OK platform=nucleo_h743zi/stm32h743xx wolfssl=5.9.4 cpu_hz=480000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=0 heap_trace=0 host_port=4403 rtt_ms=-1 group_msgs=0
+
+date=Sat Oct 10 20:16:49 2026
+label=h743-fpu-int
+dut_ip=192.168.0.3
+host_ip=192.168.0.1
+dut_hello=OK platform=nucleo_h743zi/stm32h743xx wolfssl=5.9.4 cpu_hz=480000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=0 heap_trace=0 host_port=4403 rtt_ms=-1 group_msgs=0
+
+date=Sat Oct 10 20:17:43 2026
+label=h743-fpu-int
+dut_ip=192.168.0.3
+host_ip=192.168.0.1
+dut_hello=OK platform=nucleo_h743zi/stm32h743xx wolfssl=5.9.4 cpu_hz=480000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=100 heap_trace=0 host_port=4403 rtt_ms=-1 group_msgs=0
+

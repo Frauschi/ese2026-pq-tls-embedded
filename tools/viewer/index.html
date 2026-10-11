@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ese results</title>
+<style>
+:root {
+  --bg: #f6f6f4; --panel: #ffffff; --panel2: #fafaf8; --fg: #1c1c1a; --muted: #6e6e69; --line: #e6e6e1; --line2: #d4d4ce;
+  --a: #2563eb; --b: #ea580c; --a-soft: rgba(37, 99, 235, 0.14); --b-soft: rgba(234, 88, 12, 0.16);
+  --good: #15803d; --good-bg: rgba(21, 128, 61, 0.1); --bad: #dc2626; --bad-bg: rgba(220, 38, 38, 0.1);
+  --hl: rgba(37, 99, 235, 0.06); --sel: rgba(37, 99, 235, 0.11); --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --t0: #2563eb; --t1: #dc2626; --t2: #16a34a; --t3: #9333ea; --t4: #d97706; --t5: #0891b2;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141413; --panel: #1d1d1b; --panel2: #232321; --fg: #ececea; --muted: #9c9c96; --line: #30302d; --line2: #42423e;
+    --a: #60a5fa; --b: #fb923c; --a-soft: rgba(96, 165, 250, 0.2); --b-soft: rgba(251, 146, 60, 0.2);
+    --good: #4ade80; --good-bg: rgba(74, 222, 128, 0.12); --bad: #f87171; --bad-bg: rgba(248, 113, 113, 0.13);
+    --hl: rgba(96, 165, 250, 0.07); --sel: rgba(96, 165, 250, 0.14); --shadow: none;
+    --t0: #60a5fa; --t1: #f87171; --t2: #4ade80; --t3: #c084fc; --t4: #fbbf24; --t5: #22d3ee;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141413; --panel: #1d1d1b; --panel2: #232321; --fg: #ececea; --muted: #9c9c96; --line: #30302d; --line2: #42423e;
+  --a: #60a5fa; --b: #fb923c; --a-soft: rgba(96, 165, 250, 0.2); --b-soft: rgba(251, 146, 60, 0.2);
+  --good: #4ade80; --good-bg: rgba(74, 222, 128, 0.12); --bad: #f87171; --bad-bg: rgba(248, 113, 113, 0.13);
+  --hl: rgba(96, 165, 250, 0.07); --sel: rgba(96, 165, 250, 0.14); --shadow: none;
+  --t0: #60a5fa; --t1: #f87171; --t2: #4ade80; --t3: #c084fc; --t4: #fbbf24; --t5: #22d3ee;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+button, select, input { font: inherit; color: inherit; }
+a { color: var(--a); }
+.num, td, .stat { font-variant-numeric: tabular-nums; }
+
+.top { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 10px 20px; background: var(--panel); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+.brand { font-weight: 650; font-size: 15px; letter-spacing: -0.01em; }
+.brand small { color: var(--muted); font-weight: 400; margin-left: 6px; }
+.runs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.run { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.tag { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 5px; font-size: 11px; font-weight: 700; color: #fff; flex: none; }
+.tag.a { background: var(--a); } .tag.b { background: var(--b); }
+select, input[type="search"] { background: var(--panel2); border: 1px solid var(--line2); border-radius: 7px; padding: 5px 8px; min-width: 0; max-width: 100%; }
+select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--a); outline-offset: 1px; }
+.icon { background: none; border: 1px solid var(--line2); border-radius: 7px; padding: 4px 9px; cursor: pointer; color: var(--muted); }
+.icon:hover { color: var(--fg); background: var(--hl); }
+.seg { display: inline-flex; background: var(--panel2); border: 1px solid var(--line2); border-radius: 9px; padding: 2px; gap: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: none; border-radius: 7px; padding: 4px 12px; cursor: pointer; color: var(--muted); white-space: nowrap; }
+.seg button:hover:not(:disabled) { color: var(--fg); }
+.seg button.on { background: var(--panel); color: var(--fg); box-shadow: 0 0 0 1px var(--line2), var(--shadow); font-weight: 550; }
+.seg button:disabled { opacity: 0.4; cursor: default; }
+.seg .cnt { color: var(--muted); font-size: 11px; margin-left: 5px; font-weight: 400; }
+.spacer { flex: 1; }
+
+.shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 18px; padding: 16px 20px 40px; align-items: start; }
+body.noside .shell { grid-template-columns: minmax(0, 1fr); }
+body.noside aside { display: none; }
+aside { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; box-shadow: var(--shadow); }
+.side-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-weight: 600; }
+.side-head .pill { font-weight: 500; }
+.side-head button { margin-left: auto; }
+aside input[type="search"] { width: 100%; margin-bottom: 12px; }
+.fgroup { border-top: 1px solid var(--line); padding: 10px 0 6px; }
+.fhead { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.fhead .fcount { color: var(--muted); font-weight: 400; }
+.fhead .acts { margin-left: auto; display: flex; gap: 6px; }
+.lnk { background: none; border: 0; padding: 0 2px; color: var(--a); cursor: pointer; font-size: 12px; }
+.lnk:hover { text-decoration: underline; }
+.fsub { font-size: 11px; color: var(--muted); margin: 6px 0 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { border: 1px solid var(--line2); background: none; border-radius: 999px; padding: 1px 9px; font-size: 12px; cursor: pointer; color: var(--muted); }
+.chip:hover { border-color: var(--muted); }
+.chip.on { background: var(--sel); border-color: transparent; color: var(--fg); }
+.pill { display: inline-block; border-radius: 999px; padding: 0 8px; font-size: 12px; background: var(--sel); color: var(--fg); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--a); border-radius: 10px; padding: 10px 14px; box-shadow: var(--shadow); min-width: 0; }
+.card.b { border-left-color: var(--b); }
+.card-h { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 6px; min-width: 0; }
+.card-h b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kv { display: flex; flex-wrap: wrap; gap: 2px 16px; font-size: 12px; }
+.kv span { color: var(--muted); }
+.kv b { font-weight: 500; color: var(--fg); margin-left: 4px; }
+.card-s { font-size: 12px; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+details { margin-top: 6px; font-size: 12px; }
+summary { cursor: pointer; color: var(--muted); }
+details pre { margin: 6px 0 0; padding: 8px; background: var(--panel2); border-radius: 6px; white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 10px; font-size: 13px; }
+.toolbar label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.status { color: var(--muted); }
+.hint { color: var(--muted); font-size: 12px; }
+.loading { padding: 40px; text-align: center; color: var(--muted); }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 14px; box-shadow: var(--shadow); }
+.tablewrap { max-height: calc(100vh - 150px); overflow: auto; }
+body.trace .tablewrap { max-height: 60vh; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13px; }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+th { position: sticky; top: 0; z-index: 1; background: var(--panel2); font-weight: 550; font-size: 12px; cursor: pointer; user-select: none; vertical-align: bottom; }
+th:hover { color: var(--a); }
+th small { display: block; color: var(--muted); font-weight: 400; font-size: 11px; }
+th .arr { color: var(--a); margin-left: 3px; }
+th.txt, td.txt { text-align: left; }
+th.mcol { color: var(--a); box-shadow: inset 0 -2px 0 var(--a); }
+tbody tr.row { cursor: pointer; }
+tbody tr.row:hover td { background: var(--hl); }
+tbody tr.sel td { background: var(--sel); }
+tbody tr.off td { color: var(--muted); opacity: 0.55; cursor: not-allowed; }
+td.bar { min-width: 96px;  background-image: linear-gradient(to right, var(--a-soft) var(--w), transparent var(--w)); background-repeat: no-repeat; font-weight: 550; }
+td.bar.b { background-image: linear-gradient(to right, var(--b-soft) var(--w), transparent var(--w)); }
+td.dim { color: var(--muted); }
+td .pill.bad { font-size: 11px; }
+.ratio { display: inline-block; min-width: 52px; padding: 0 6px; border-radius: 5px; }
+.ratio.good { background: var(--good-bg); color: var(--good); font-weight: 600; }
+.ratio.bad { background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+.ratio.same { color: var(--muted); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+tr.detail td { background: var(--panel2); padding: 12px 14px; text-align: left; white-space: normal; cursor: default; }
+.dbody { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-start; }
+.dbody svg { flex: 1 1 420px; max-width: 760px; }
+.dstats { width: auto; flex: none; }
+.dstats th, .dstats td { position: static; background: none; cursor: default; padding: 2px 10px; border: 0; font-size: 12px; }
+.dstats th { color: var(--muted); }
+.dtitle { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-weight: 600; }
+.dtitle .lnk { margin-left: auto; }
+.empty { padding: 28px; text-align: center; color: var(--muted); }
+
+.tsel { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 10px; min-height: 28px; }
+.tchip { display: inline-flex; align-items: center; gap: 6px; background: var(--panel); border: 1px solid var(--line2); border-radius: 999px; padding: 2px 4px 2px 10px; font-size: 12px; }
+.tchip i { width: 16px; height: 0; border-top: 3px solid; }
+.tchip .pk { color: var(--muted); }
+.tchip button { border: 0; background: none; cursor: pointer; color: var(--muted); border-radius: 50%; width: 20px; height: 20px; line-height: 1; }
+.tchip button:hover { background: var(--bad-bg); color: var(--bad); }
+#tpanel { padding: 10px 10px 4px; }
+#spanel, #rpanel { padding: 10px 12px 6px; }
+#rsvg svg { display: block; width: 100%; height: auto; }
+td.heat { background: color-mix(in srgb, var(--a) calc(var(--h) * 1%), transparent); font-weight: 550; }
+.shead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 6px; font-size: 13px; }
+#ssvg svg { display: block; width: 100%; height: auto; }
+#tchart { position: relative; }
+#tchart svg { display: block; cursor: crosshair; }
+svg text { fill: var(--fg); font-size: 11px; }
+svg .grid { stroke: var(--line); }
+svg .axis { stroke: var(--line2); }
+svg .mut { fill: var(--muted); }
+#tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line2); border-radius: 8px; padding: 6px 8px; font-size: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); display: none; z-index: 3; max-width: calc(100% - 8px); }
+#tip table { font-size: 12px; width: auto; }
+#tip td { border: 0; padding: 1px 6px; }
+#tip .st { color: var(--muted); }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); padding: 12px 16px 32px; }
+  aside { position: static; max-height: none; }
+  .top { padding: 8px 16px; position: static; }
+  .cards { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">ese results<small>wolfSSL PQC on embedded</small></div>
+  <nav class="seg" id="tabs"></nav>
+  <div class="runs">
+    <span class="seg" id="trtt" hidden></span>
+    <label class="run"><span class="tag a">A</span><select id="runA" aria-label="Run A"></select></label>
+    <button class="icon" id="swap" title="Swap A and B">⇄</button>
+    <label class="run" id="runBl"><span class="tag b">B</span><select id="runB" aria-label="Run B"></select></label>
+  </div>
+  <span class="spacer"></span>
+  <button class="icon" id="sidebtn" title="Show or hide filters">Filters</button>
+  <button class="icon" id="theme" title="Theme"></button>
+</header>
+<div class="shell">
+  <aside id="side">
+    <div class="side-head">Filters <span class="pill" id="fcount" hidden></span><button class="lnk" id="freset">reset</button></div>
+    <input type="search" id="q" placeholder="Search, e.g. mlkem mutual">
+    <div class="hint">Click a chip to toggle it, shift-click to keep only that one.</div>
+    <div id="filters"></div>
+  </aside>
+  <main>
+    <section class="cards" id="cards"></section>
+    <div class="loading" id="loading" hidden></div>
+    <div class="toolbar" id="genctl">
+      <label>Metric <select id="metric"></select></label>
+      <label><input type="checkbox" id="log"> log-scale bars</label>
+      <span class="status" id="count"></span>
+      <span class="spacer"></span>
+      <span class="hint">Click a header to sort and chart it, a row for its samples.</span>
+    </div>
+    <div class="toolbar" id="trctl" hidden>
+      <span class="seg" id="txaxis"></span>
+      <label><input type="checkbox" id="talign"> align at markers</label>
+      <label><input type="checkbox" id="tphase"> handshake steps</label>
+      <span class="status" id="tcount"></span>
+      <span class="spacer"></span>
+      <span class="hint" id="thint"></span>
+    </div>
+    <div class="toolbar" id="rctl" hidden>
+      <span class="seg" id="rmet"></span>
+      <label><input type="checkbox" id="rdrift"> correct compute drift</label>
+      <span class="status" id="rcount"></span>
+      <span class="spacer"></span>
+      <span class="hint">Extra round trips = (TTFB &minus; 0 ms TTFB) / added delay &minus; 3; the delay is the rise in median TCP connect time.</span>
+    </div>
+    <div class="panel" id="rpanel" hidden>
+      <div class="shead"><b>Extra round trips at</b><span class="seg" id="rrtt"></span><span class="hint" id="rhint"></span></div>
+      <div id="rsvg"></div>
+    </div>
+    <div class="panel" id="spanel" hidden>
+      <div class="shead"><b>Trade-off</b><label>Time median against <select id="sx"></select></label>
+        <span class="hint">One point per profile, joined per operation in order of the x value. A filled, B hollow.</span></div>
+      <div id="ssvg"></div>
+    </div>
+    <div class="tsel" id="tsel" hidden></div>
+    <div class="panel" id="tpanel" hidden><div id="tchart"><div id="tip"></div><div id="tsvg"></div></div></div>
+    <div class="panel tablewrap"><table id="table"></table></div>
+  </main>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const ms = v => {
+  if (v == null || !Number.isFinite(v)) return '';
+  const x = v / 1e6, d = x < 10 ? 3 : x < 100 ? 2 : x < 10000 ? 1 : 0;
+  return x.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+};
+const int = v => v == null || !Number.isFinite(v) ? '' : Math.round(v).toLocaleString('en-US');
+const kb = v => (v / 1000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + ' kB';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const col = (c, l, u, how, f) => ({ c, l, u, how, f });
+const VIEWS = {
+  tls: {
+    label: 'TLS handshakes', file: 'tls.csv', keys: ['chain', 'kex', 'auth', 'dut_role'], unit: 'handshakes',
+    ok: r => r.dut_status === '0' && r.host_status === '0',
+    cols: [
+      col('ttfb_ns', 'TTFB median', 'ms', 'med', ms), col('ttfb_ns', 'TTFB p99', 'ms', 'p99', ms),
+      col('client_hs_ns', 'Client handshake', 'ms', 'med', ms), col('server_hs_ns', 'Server handshake', 'ms', 'med', ms),
+      col('tcp_ns', 'TCP connect', 'ms', 'med', ms),
+      col('c2s_bytes', 'Client → server', 'B', 'med', int), col('s2c_bytes', 'Server → client', 'B', 'med', int),
+      col('dut_heap_peak', 'Heap peak', 'B', 'max', int), col('dut_heap_total', 'Heap total', 'B', 'med', int),
+      col('dut_heap_allocs', 'Allocations', '', 'med', int), col('dut_stack', 'Stack peak', 'B', 'max', int),
+    ],
+  },
+  alg: {
+    label: 'Algorithms', file: 'alg.csv', keys: ['alg', 'op', 'variant'], unit: 'samples',
+    ok: r => r.status === '0',
+    cols: [
+      col('ns', 'Time median', 'ms', 'med', ms), col('ns', 'Time p99', 'ms', 'p99', ms),
+      col('heap_peak', 'Heap peak median', 'B', 'med', int), col('key_held', 'Key held', 'B', 'max', int),
+      col('heap_total', 'Heap total', 'B', 'med', int), col('heap_allocs', 'Allocations', '', 'med', int),
+      col('stack', 'Stack peak', 'B', 'max', int), col('flash', 'Flash cost', 'B', 'max', int),
+    ],
+  },
+  fp: {
+    label: 'Footprint', file: 'footprint.csv', keys: ['alg', 'flavor', 'variant'], unit: 'builds',
+    ok: () => true,
+    cols: [
+      col('flash_delta', 'Flash cost', 'B', 'max', int), col('ram_delta', 'Static RAM cost', 'B', 'max', int),
+      col('flash', 'Image flash', 'B', 'max', int),
+    ],
+  },
+  ctx: {
+    label: 'Context setup', file: 'tls_ctx.csv', keys: ['chain', 'kex', 'auth', 'dut_role'], unit: 'setups',
+    ok: r => r.status === '0',
+    cols: [
+      col('setup_ns', 'Setup time', 'ms', 'med', ms), col('heap_peak', 'Heap peak', 'B', 'max', int),
+      col('heap_held', 'Heap held', 'B', 'max', int),
+    ],
+  },
+  trace: {
+    label: 'Heap trace', file: 'heap_trace.csv', keys: ['chain', 'kex', 'auth', 'dut_role'], cols: [],
+  },
+  rtt: {
+    label: 'Network RTT', keys: ['chain', 'kex', 'auth', 'dut_role'], cols: [],
+  },
+};
+const KEYLBL = { chain: 'Chain', kex: 'Key exchange', auth: 'Auth', dut_role: 'DUT role', alg: 'Algorithm', op: 'Operation',
+  variant: 'Profile', flavor: 'Flavor' };
+const PROFILES = ['default', 'smallmem', 'smallmem-fast', 'cache', 'small'];
+const GROUPS = {
+  variant: v => [PROFILES.indexOf(v) < 0 ? 99 : PROFILES.indexOf(v), ''],
+  chain: v => v.startsWith('lms+') ? [1, 'LMS CA over'] : v.startsWith('xmss+') ? [2, 'XMSS CA over'] : [0, 'Single-algorithm chains'],
+  alg: v => ['baseline', 'sha3'].includes(v) ? [3, 'Footprint baseline'] :
+    ['secp256r1', 'x25519'].includes(v) || v.startsWith('mlkem') ? [0, 'Key exchange'] : /^(lms|xmss)(192|mt)?(_[hlwd]\d+)*$/.test(v) ? [2, 'Stateful signatures'] : [1, 'Signatures'],
+};
+const MSGC = { ClientHello: '#f59e0b', ServerHello: '#ef4444', EncryptedExtensions: '#14b8a6', CertificateRequest: '#84cc16',
+  Certificate: '#3b82f6', ProcessPeerCerts: '#ec4899', CertificateVerify: '#8b5cf6', Finished: '#10b981',
+  wolfSSL_CTX_new: '#64748b', wolfSSL_CTX_set_cipher_list: '#eab308', wolfSSL_CTX_set_groups: '#f97316', wolfSSL_CTX_use_certificate_chain_buffer: '#0ea5e9',
+  wolfSSL_CTX_use_PrivateKey_buffer: '#d946ef', wolfSSL_CTX_load_verify_buffer: '#22c55e' };
+const stepColor = l => MSGC[l.replace(/^(Send|Do)Tls13/, '')] || '#94a3b8';
+const NTRACE = 6;
+const isStep = label => /^[A-Z]|^wolfSSL_/.test(label);
+const natCmp = (x, y) => String(x).localeCompare(String(y), 'en', { numeric: true });
+
+const S = { runs: [], files: {}, notes: {}, a: '', b: '', view: 'tls', data: {}, excl: {}, q: '', metric: {}, sort: {}, sel: null,
+  sx: 2, tsel: [], tselInit: false, log: true, tx: 'seq', talign: true, tphase: true, trtt: 0, rrtt: 0, rmet: 'extra', rdrift: true };
+
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, val] of Object.entries(attrs)) {
+    if (val == null || val === false) continue;
+    k.startsWith('on') ? e[k] = val : e.setAttribute(k, val === true ? '' : val);
+  }
+  kids.flat().forEach(c => c != null && c !== false && e.append(c));
+  return e;
+}
+const lnk = (txt, fn) => el('button', { class: 'lnk', onclick: e => { e.stopPropagation(); fn(); } }, txt);
+
+function parseCsv(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const hdr = lines.shift().split(',');
+  return lines.map(l => { const v = l.split(','), o = {}; hdr.forEach((h, i) => o[h] = v[i]); return o; });
+}
+
+async function listing(path) {
+  const html = await (await fetch(path)).text();
+  return [...html.matchAll(/href="([^"?#/][^"]*)"/g)].map(m => decodeURIComponent(m[1]));
+}
+const listDirs = async path => (await listing(path)).filter(x => x.endsWith('/'));
+
+async function findRuns() {
+  const runs = [];
+  for (const board of await listDirs('/results/')) {
+    for (const run of await listDirs('/results/' + board)) runs.push(board + run.replace(/\/$/, ''));
+  }
+  await Promise.all(runs.map(async run => {
+    S.files[run] = new Set(await listing(`/results/${run}/`));
+    if (!S.files[run].has('meta.txt')) return;
+    const note = (await (await fetch(`/results/${run}/meta.txt`)).text()).match(/^note=(.*)$/m);
+    if (note) S.notes[run] = note[1];
+  }));
+  return runs.sort();
+}
+
+const BYRTT = ['tls', 'ctx'];
+const rttOf = run => +(run.match(/-rtt(\d+)$/)?.[1] ?? 0);
+const rttRuns = run => rttFamily(run).filter(f => f.rtt != null);
+const supports = (run, k) => k === 'rtt' ? rttRuns(run).length > 1 : S.files[run]?.has(VIEWS[k].file);
+
+// The RTT tab lists each family once, under its lowest-RTT run.
+function runsFor(k, rtt = S.trtt) {
+  const rs = S.runs.filter(r => supports(r, k) && (!BYRTT.includes(k) || rtt == null || rttOf(r) === rtt));
+  return k === 'rtt' ? rs.filter(r => rttRuns(r)[0].run === r) : rs;
+}
+
+async function load(run) {
+  if (!run || S.data[run]) return;
+  const d = {};
+  await Promise.all(Object.entries(VIEWS).map(async ([k, v]) => {
+    if (!v.file) { d[k] = []; return; }
+    const r = await fetch(`/results/${run}/${v.file}`);
+    d[k] = r.ok ? parseCsv(await r.text()) : [];
+  }));
+  const m = await fetch(`/results/${run}/meta.txt`);
+  d.meta = m.ok ? await m.text() : '';
+  // Runs from before the profile column all used smallmem.
+  for (const r of d.alg) r.variant ||= 'smallmem';
+  const fp = new Map(d.fp.map(r => [[r.variant, r.alg, r.flavor].join('|'), +r.flash_delta]));
+  for (const r of d.alg) {
+    const fam = r.alg.replace(/^(slhdsa|lms|xmss).*/, '$1'), key = f => [r.variant, fam, f].join('|');
+    r.flash = fp.get(key(r.op)) ?? fp.get(key('full')) ?? '';
+  }
+  S.data[run] = d;
+}
+
+function parseMeta(txt) {
+  const o = {};
+  for (const line of txt.split('\n')) {
+    if (line.startsWith('date=')) o.date = line.slice(5).trim();
+    else if (line.startsWith('note=')) o.note ??= line.slice(5).trim();
+    else for (const m of line.matchAll(/(\w+)=(\S+)/g)) o[m[1]] = m[2];
+  }
+  return o;
+}
+
+function quant(sorted, q) {
+  if (!sorted.length) return null;
+  return sorted[Math.min(sorted.length - 1, Math.ceil(q * sorted.length) - 1)];
+}
+
+function aggregate(rows, v) {
+  const groups = new Map();
+  for (const r of rows) {
+    const k = v.keys.map(f => r[f]).join('|');
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(r);
+  }
+  const out = new Map();
+  for (const [k, g] of groups) {
+    const good = g.filter(v.ok), a = { key: k, rows: g, n: g.length, fail: g.length - good.length };
+    v.keys.forEach(f => a[f] = g[0][f]);
+    v.cols.forEach(({ c, how }, i) => {
+      const xs = good.map(r => +r[c]).filter(Number.isFinite).sort((x, y) => x - y);
+      a[i] = how === 'max' ? (xs.length ? xs[xs.length - 1] : null) : quant(xs, how === 'p99' ? 0.99 : 0.5);
+    });
+    out.set(k, a);
+  }
+  return out;
+}
+
+function passes(a, keys) {
+  if (!keys.every(f => !S.excl[f]?.has(a[f]))) return false;
+  const terms = S.q.toLowerCase().split(/\s+/).filter(Boolean);
+  const txt = keys.map(f => a[f]).join(' ').toLowerCase();
+  return terms.every(t => txt.includes(t));
+}
+
+function renderFilters(items, keys) {
+  const box = $('filters');
+  box.replaceChildren();
+  let active = 0;
+  for (const k of keys) {
+    const grp = GROUPS[k] || (() => [0, '']);
+    const vals = [...new Set(items.map(a => a[k]))].sort((x, y) => grp(x)[0] - grp(y)[0] || natCmp(x, y));
+    const ex = S.excl[k] ||= new Set();
+    const on = vals.filter(x => !ex.has(x)).length;
+    if (on < vals.length) active++;
+    const sec = el('section', { class: 'fgroup' }, el('div', { class: 'fhead' },
+      KEYLBL[k] || k, el('span', { class: 'fcount' }, `${on}/${vals.length}`),
+      el('span', { class: 'acts' }, lnk('all', () => { vals.forEach(x => ex.delete(x)); render(); }),
+        lnk('none', () => { vals.forEach(x => ex.add(x)); render(); }))));
+    let cur = null, chips = null;
+    for (const x of vals) {
+      const [gi, gname] = grp(x);
+      if (gi !== cur || !chips) {
+        cur = gi;
+        if (gname && GROUPS[k]) sec.append(el('div', { class: 'fsub' }, gname));
+        chips = el('div', { class: 'chips' });
+        sec.append(chips);
+      }
+      const shown = k === 'chain' ? x.replace(/^(lms|xmss)\+/, '') : x;
+      chips.append(el('button', {
+        class: 'chip' + (ex.has(x) ? '' : ' on'), 'aria-pressed': String(!ex.has(x)), title: `${x} - shift-click to show only this`,
+        onclick: e => {
+          if (e.shiftKey || e.altKey) vals.forEach(y => y === x ? ex.delete(y) : ex.add(y));
+          else ex.has(x) ? ex.delete(x) : ex.add(x);
+          render();
+        },
+      }, shown));
+    }
+    box.append(sec);
+  }
+  const q = S.q.trim() ? 1 : 0;
+  $('fcount').hidden = !active && !q;
+  $('fcount').textContent = `${active + q} active`;
+}
+
+function barScale(vals) {
+  const xs = vals.filter(x => x > 0);
+  if (!xs.length) return () => 0;
+  const hi = Math.max(...xs), lo = Math.min(...xs) / 1.5;
+  return x => !(x > 0) ? 0 : 100 * (S.log && hi > lo ? Math.log(x / lo) / Math.log(hi / lo) : x / hi);
+}
+
+function sortRows(rows, so) {
+  if (!so || so.i >= (rows[0]?.c.length ?? 0)) return;
+  const { i, dir } = so;
+  rows.sort((x, y) => {
+    const p = x.c[i], q = y.c[i];
+    return (typeof p === 'string' ? natCmp(p, q) : (p ?? -Infinity) - (q ?? -Infinity)) * dir;
+  });
+}
+
+function headRow(heads, mcol) {
+  const so = S.sort[S.view];
+  return el('tr', {}, heads.map((h, i) => el('th', {
+    class: (h.txt ? 'txt' : '') + (i === mcol ? ' mcol' : ''), title: h.mi != null ? 'Sort and chart this column' : 'Sort',
+    onclick: () => {
+      if (h.mi != null) S.metric[S.view] = h.mi;
+      S.sort[S.view] = { i, dir: so?.i === i ? -so.dir : h.txt ? 1 : -1 };
+      render();
+    },
+  }, h.l, so?.i === i ? el('span', { class: 'arr' }, so.dir > 0 ? '▲' : '▼') : null, h.u != null ? el('small', {}, h.u || ' ') : null)));
+}
+
+function ratioCell(r) {
+  if (r == null || !Number.isFinite(r)) return el('td', {}, '');
+  const cls = r < 0.97 ? 'good' : r > 1.03 ? 'bad' : 'same';
+  return el('td', { title: cls === 'same' ? 'within 3%' : cls === 'good' ? 'B is lower' : 'B is higher' },
+    el('span', { class: 'ratio ' + cls }, r.toFixed(2) + '×'));
+}
+
+function renderTable(list, aggB, mi) {
+  const v = VIEWS[S.view], nk = v.keys.length, t = $('table');
+  const heads = [...v.keys.map(k => ({ l: KEYLBL[k], txt: true })), { l: 'n', u: '' }, { l: 'Failed', u: '' },
+    ...v.cols.map((c, ci) => ({ l: c.l, u: c.u, mi: ci }))];
+  if (aggB) heads.push({ l: 'B ' + v.cols[mi].l, u: v.cols[mi].u }, { l: 'B / A', u: '' });
+  const rows = list.map(a => {
+    const b = aggB?.get(a.key)?.[mi];
+    const c = [...v.keys.map(k => a[k]), a.n, a.fail, ...v.cols.map((x, ci) => a[ci])];
+    if (aggB) c.push(b ?? null, b != null && a[mi] ? b / a[mi] : null);
+    return { a, c };
+  });
+  sortRows(rows, S.sort[S.view]);
+  const mcol = nk + 2 + mi, bcol = aggB ? heads.length - 2 : -1;
+  const bar = barScale(rows.flatMap(r => [r.c[mcol], bcol >= 0 ? r.c[bcol] : null]));
+  const body = el('tbody');
+  if (!rows.length) body.append(el('tr', {}, el('td', { colspan: heads.length, class: 'empty' }, 'No rows match the filters.')));
+  for (const { a, c } of rows) {
+    const sel = S.sel === a.key;
+    body.append(el('tr', { class: 'row' + (sel ? ' sel' : ''), onclick: () => { S.sel = sel ? null : a.key; render(); } }, c.map((x, i) => {
+      if (i < nk) return el('td', { class: 'txt' }, x);
+      if (i === nk) return el('td', { class: 'dim' }, int(x));
+      if (i === nk + 1) return el('td', {}, x > 0 ? el('span', { class: 'pill bad' }, int(x)) : el('span', { class: 'hint' }, '0'));
+      if (aggB && i === c.length - 1) return ratioCell(x);
+      const f = i === bcol ? v.cols[mi].f : v.cols[i - nk - 2].f;
+      if (i === mcol || i === bcol) return el('td', { class: 'bar' + (i === bcol ? ' b' : ''), style: `--w:${bar(x).toFixed(1)}%` }, f(x));
+      return el('td', {}, f(x));
+    })));
+    if (sel) body.append(detailRow(a, aggB?.get(a.key), mi, heads.length));
+  }
+  t.replaceChildren(el('thead', {}, headRow(heads, mcol)), body);
+}
+
+function stats(g, v, c) {
+  const xs = g.rows.filter(v.ok).map(r => +r[c]).filter(Number.isFinite).sort((x, y) => x - y);
+  return { xs, n: g.n, fail: g.fail, min: xs[0], med: quant(xs, 0.5), p99: quant(xs, 0.99), max: xs[xs.length - 1],
+    mean: xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : null };
+}
+
+function ticks(lo, hi, n) {
+  const span = hi - lo || 1, step0 = span / n, mag = 10 ** Math.floor(Math.log10(step0));
+  const step = [1, 2, 5, 10].map(f => f * mag).find(s => s >= step0);
+  const out = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(v);
+  return out;
+}
+
+function detailRow(a, b, mi, ncols) {
+  const v = VIEWS[S.view], { c, l, u, f } = v.cols[mi];
+  const ser = [['A', a, 'var(--a)', S.a]];
+  if (b) ser.push(['B', b, 'var(--b)', S.b]);
+  const st = ser.map(([, g]) => stats(g, v, c));
+  const all = st.flatMap(s => s.xs);
+  const W = 720, lane = 34, H = lane * ser.length + 30, L = 14, R = 14;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%">`;
+  if (all.length) {
+    let lo = Math.min(...all), hi = Math.max(...all);
+    if (hi === lo) { lo -= Math.abs(lo) * 0.05 || 1; hi += Math.abs(hi) * 0.05 || 1; }
+    const x = val => L + (val - lo) / (hi - lo) * (W - L - R);
+    for (const tv of ticks(lo, hi, 6)) {
+      svg += `<line class="grid" x1="${x(tv)}" x2="${x(tv)}" y1="4" y2="${H - 22}"/><text class="mut" x="${x(tv)}" y="${H - 8}" text-anchor="middle">${f(tv)}</text>`;
+    }
+    ser.forEach(([, , color], j) => {
+      const s = st[j], cy = 4 + lane * j + lane / 2;
+      s.xs.forEach((val, i) => {
+        const jit = (((i * 9301 + 49297) % 233280) / 233280 - 0.5) * (lane - 12);
+        svg += `<circle cx="${x(val).toFixed(1)}" cy="${(cy + jit).toFixed(1)}" r="3.2" style="fill:${color}" fill-opacity="0.45"><title>${f(val)} ${u}</title></circle>`;
+      });
+      if (s.med != null) svg += `<line x1="${x(s.med)}" x2="${x(s.med)}" y1="${cy - lane / 2 + 2}" y2="${cy + lane / 2 - 2}" style="stroke:${color}" stroke-width="2.5"><title>median ${f(s.med)}</title></line>`;
+    });
+  } else svg += `<text class="mut" x="${W / 2}" y="${H / 2}" text-anchor="middle">no successful samples</text>`;
+  svg += '</svg>';
+  const unit = u ? ` ${u}` : '';
+  const tbl = el('table', { class: 'dstats' },
+    el('tr', {}, el('th', {}), ...['n', 'failed', 'min', 'median', 'mean', 'p99', 'max'].map(h => el('th', {}, h))),
+    ser.map(([tag], j) => { const s = st[j]; return el('tr', {}, el('td', {}, el('span', { class: 'tag ' + tag.toLowerCase() }, tag)),
+      el('td', {}, int(s.n)), el('td', {}, s.fail ? el('span', { class: 'pill bad' }, int(s.fail)) : '0'),
+      ...[s.min, s.med, s.mean, s.p99, s.max].map(x => el('td', {}, f(x)))); }));
+  const box = el('div', {}, el('div', { class: 'dtitle' }, VIEWS[S.view].keys.map(k => a[k]).join(' · '),
+    el('span', { class: 'hint' }, `${l}${u ? ' [' + u + ']' : ''}, one dot per sample, bar = median`),
+    lnk('close', () => { S.sel = null; render(); })),
+    el('div', { class: 'dbody' }, tbl));
+  box.lastChild.insertAdjacentHTML('afterbegin', svg);
+  return el('tr', { class: 'detail' }, el('td', { colspan: ncols }, box));
+}
+
+function traceMap(d) {
+  if (d.traceMap) return d.traceMap;
+  const m = new Map();
+  for (const r of d.trace) {
+    const k = [r.chain, r.kex, r.auth, r.dut_role].join('|');
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push({ t: +r.t_us / 1000, ev: r.event, size: +r.size, heap: +r.heap, label: r.label });
+  }
+  for (const [k, evs] of m) {
+    const [chain, kex, auth, dut_role] = k.split('|');
+    const s = { key: k, chain, kex, auth, dut_role, evs, events: evs.length, peak: 0, conn: null,
+                ctxHeld: null, ctxAfter: null, at: '', dur: evs.length ? evs[evs.length - 1].t : 0 };
+    const open = [];
+    let last = '', sslNew = null, sslFreed = null;
+    evs.forEach((e, i) => {
+      if (e.ev === 'mark' || e.ev === 'end') last = e.label + (e.ev === 'end' ? ' end' : '');
+      if (e.ev === 'mark') {
+        if (isStep(e.label)) open.push(e.label);
+        if (e.label === 'ssl_new') sslNew = i;
+        if (e.label === 'ssl_freed') { sslFreed = i; s.ctxAfter = e.heap; }
+        if (e.label === 'ctx_ready') s.ctxHeld = e.heap;
+      } else if (e.ev === 'end') {
+        const j = open.lastIndexOf(e.label);
+        if (j >= 0) open.splice(j, 1);
+      }
+      if (e.heap > s.peak) { s.peak = e.heap; s.at = open.length ? open[open.length - 1] : 'after ' + last; }
+    });
+    if (sslNew != null) {
+      const base = evs[sslNew].heap, end = sslFreed ?? evs.length - 1;
+      s.conn = 0;
+      for (let i = sslNew; i <= end; i++) s.conn = Math.max(s.conn, evs[i].heap - base);
+    }
+    m.set(k, s);
+  }
+  return (d.traceMap = m);
+}
+
+function renderTraceTable(list, mB) {
+  const t = $('table');
+  const heads = [{ l: 'Chain', txt: true }, { l: 'Key exchange', txt: true }, { l: 'Auth', txt: true }, { l: 'DUT role', txt: true },
+    { l: 'Events', u: '' }, { l: 'Context held', u: 'B' }, { l: 'Connection peak', u: 'B' }, { l: 'Total peak', u: 'B' },
+    { l: 'Peak during', u: '', txt: true }, { l: 'Duration', u: 'ms' }];
+  if (mB) heads.push({ l: 'B connection peak', u: 'B' }, { l: 'B / A', u: '' });
+  const role = S.tsel.length ? S.tsel[0].split('|')[3] : null, full = S.tsel.length >= NTRACE;
+  const rows = list.map(s => {
+    const b = mB?.get(s.key);
+    const c = [s.chain, s.kex, s.auth, s.dut_role, s.events, s.ctxHeld, s.conn, s.peak, s.at, s.dur];
+    if (mB) c.push(b?.conn ?? null, b?.conn && s.conn ? b.conn / s.conn : null);
+    return { s, c };
+  });
+  sortRows(rows, S.sort.trace);
+  const bcol = mB ? 10 : -1, bar = barScale(rows.flatMap(r => [r.c[6], bcol >= 0 ? r.c[bcol] : null]));
+  const body = el('tbody');
+  if (!rows.length) body.append(el('tr', {}, el('td', { colspan: heads.length, class: 'empty' }, 'No traces match the filters.')));
+  for (const { s, c } of rows) {
+    const si = S.tsel.indexOf(s.key);
+    const why = si >= 0 ? '' : role && s.dut_role !== role ? `Only ${role} traces can be overlaid with the current selection`
+      : full ? `At most ${NTRACE} traces; remove one first` : '';
+    const row = el('tr', { class: why ? 'off' : 'row' + (si >= 0 ? ' sel' : ''), title: why || (si >= 0 ? 'Click to remove' : 'Click to overlay'),
+      onclick: () => {
+        if (why) return;
+        if (si >= 0) S.tsel.splice(si, 1); else S.tsel.push(s.key);
+        render();
+      } }, c.map((x, i) => {
+      if (i < 4 || i === 8) return el('td', { class: 'txt' }, x ?? '');
+      if (mB && i === c.length - 1) return ratioCell(x);
+      if (i === 9) return el('td', {}, x == null ? '' : x.toFixed(2));
+      if (i === 6 || i === bcol) return el('td', { class: 'bar' + (i === bcol ? ' b' : ''), style: `--w:${bar(x).toFixed(1)}%` }, int(x));
+      return el('td', {}, int(x));
+    }));
+    if (si >= 0) row.firstChild.prepend(el('span', { class: 'sw', style: `background:var(--t${si})` }));
+    body.append(row);
+  }
+  t.replaceChildren(el('thead', {}, headRow(heads, 6)), body);
+}
+
+const ctxText = s => kb(s.ctxHeld) + (s.ctxAfter > s.ctxHeld ? ` → ${kb(s.ctxAfter)}` : '');
+
+function renderTraceChips(mA, mB) {
+  const box = $('tsel');
+  box.hidden = false;
+  if (!S.tsel.length) { box.replaceChildren(el('span', { class: 'hint' }, 'Click rows below to overlay up to six traces of one DUT role.')); return; }
+  const role = S.tsel[0].split('|')[3];
+  box.replaceChildren(el('span', { class: 'hint' }, `Overlaying ${role} traces:`), ...S.tsel.map((k, i) => {
+    const a = mA.get(k), b = mB?.get(k), [chain, kex, auth] = k.split('|');
+    const pk = [a && `A ${kb(a.peak)}`, b && `B ${kb(b.peak)}`].filter(Boolean).join(' · ') + ' peak · ctx ' +
+      [a, b].filter(x => x?.ctxHeld != null).map(ctxText).join(' / ');
+    return el('span', { class: 'tchip' }, el('i', { style: `border-top-color:var(--t${i})` }), `${chain} · ${kex} · ${auth}`,
+      el('span', { class: 'pk' }, pk), el('button', { title: 'Remove', 'aria-label': 'Remove', onclick: () => { S.tsel.splice(i, 1); render(); } }, '×'));
+  }), S.tsel.length > 1 ? lnk('clear all', () => { S.tsel = []; render(); }) : null);
+}
+
+function interp(pts, v) {
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+    if (v <= x1) return x1 === x0 ? y1 : y0 + (v - x0) * (y1 - y0) / (x1 - x0);
+  }
+  const [xl, yl] = pts[pts.length - 1];
+  return yl + (v - xl);
+}
+
+function anchors(s) {
+  const cnt = {}, out = [];
+  s.evs.forEach((e, i) => {
+    if (e.ev === 'mark' || e.ev === 'end') {
+      const id = e.ev + ':' + e.label;
+      cnt[id] = (cnt[id] || 0) + 1;
+      out.push([s.x[i], id + '#' + cnt[id]]);
+    }
+  });
+  return out;
+}
+
+function lcs(a, b) {
+  const m = a.length, n = b.length, L = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = m - 1; i >= 0; i--)
+    for (let j = n - 1; j >= 0; j--) L[i][j] = a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out = [];
+  for (let i = 0, j = 0; i < m && j < n;) {
+    if (a[i] === b[j]) { out.push(a[i]); i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+  }
+  return out;
+}
+
+// Heap events matched by (op, size) inside each marker step, skipped where the LCS table would be too large.
+function matchEvents(series, lo, hi) {
+  const seqs = series.map((se, i) => se.evs.flatMap((e, k) => e.ev !== 'mark' && e.ev !== 'end' && se.x[k] > lo[i] && se.x[k] < hi[i] ? [k] : []));
+  if (Math.max(...seqs.map(q => q.length)) > 2500) return series.map(() => []);
+  const sig = (i, k) => series[i].evs[k].ev + ':' + series[i].evs[k].size;
+  const common = seqs.slice(1).reduce((c, q, i) => lcs(c, q.map(k => sig(i + 1, k))), seqs[0].map(k => sig(0, k)));
+  return series.map((se, i) => {
+    let p = 0;
+    return common.map(c => { while (sig(i, seqs[i][p]) !== c) p++; return se.x[seqs[i][p++]]; });
+  });
+}
+
+// Maps every series onto one timeline whose steps between shared anchors are as wide as the widest series.
+function alignSeries(series) {
+  const an = series.map(se => new Map(anchors(se).map(([x, id]) => [id, x])));
+  const common = series.slice(1).reduce((c, se, i) => lcs(c, [...an[i + 1].keys()]), [...an[0].keys()]);
+  const mpos = series.map((se, i) => [se.x[0], ...common.map(id => an[i].get(id)), se.x[se.x.length - 1]]);
+  const pos = series.map((se, i) => [mpos[i][0]]);
+  for (let j = 1; j < mpos[0].length; j++) {
+    const ev = matchEvents(series, mpos.map(p => p[j - 1]), mpos.map(p => p[j]));
+    series.forEach((se, i) => pos[i].push(...ev[i], mpos[i][j]));
+  }
+  const canon = [0];
+  for (let j = 1; j < pos[0].length; j++) canon.push(canon[j - 1] + Math.max(...pos.map(p => p[j] - p[j - 1])));
+  series.forEach((se, i) => {
+    const pts = pos[i].map((x, j) => [x, canon[j]]);
+    se.x = se.x.map(v => interp(pts, v));
+  });
+  return common.length;
+}
+
+function stepsOf(se) {
+  const out = [], open = [];
+  se.evs.forEach((e, i) => {
+    if ((e.ev !== 'mark' && e.ev !== 'end') || !isStep(e.label)) return;
+    if (e.ev === 'mark') { open.push({ label: e.label, x0: se.x[i], d: open.length }); return; }
+    for (let j = open.length - 1; j >= 0; j--) if (open[j].label === e.label) { out.push({ ...open.splice(j, 1)[0], x1: se.x[i] }); break; }
+  });
+  return out;
+}
+
+function renderTracePlot(mA, mB) {
+  const panel = $('tpanel');
+  const series = [];
+  S.tsel.forEach((k, i) => {
+    if (mA.has(k)) series.push({ s: mA.get(k), run: 'A', ci: i, dash: '' });
+    if (mB?.has(k)) series.push({ s: mB.get(k), run: 'B', ci: i, dash: '6 3' });
+  });
+  panel.hidden = !series.length;
+  if (!series.length) return;
+  series.forEach(se => { se.evs = se.s.evs; se.x = se.evs.map((e, i) => S.tx === 't' ? e.t : i); });
+  const ref = series[0];
+  const aligned = series.length > 1 && S.talign;
+  if (aligned) alignSeries(series);
+  const steps = S.tphase ? stepsOf(ref) : [];
+  const rowsN = steps.length ? Math.min(3, Math.max(...steps.map(s => s.d)) + 1) : 0;
+  const W = 1100, L = 58, R = 14, LR = 17, T = rowsN * LR + 10, PH = 380, H = T + PH + 58;
+  const xmin = Math.min(...series.map(se => se.x[0])), xmax = Math.max(...series.map(se => se.x[se.x.length - 1]));
+  const ymax = Math.max(...series.map(se => se.s.peak)) * 1.06 || 1;
+  const px = v => L + (v - xmin) / (xmax - xmin || 1) * (W - L - R);
+  const py = v => T + PH - v / ymax * PH;
+  let s = `<svg width="100%" viewBox="0 0 ${W} ${H}" id="tsvgel">`;
+  for (const v of ticks(0, ymax, 6)) {
+    s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${py(v)}" y2="${py(v)}"/><text class="mut" x="${L - 8}" y="${py(v) + 4}" text-anchor="end">${(v / 1000).toLocaleString('en-US', { maximumFractionDigits: 1 })}</text>`;
+  }
+  for (const st of steps) {
+    const x0 = px(st.x0), w = Math.max(px(st.x1) - x0, 1), c = stepColor(st.label);
+    s += `<rect x="${x0}" y="${T}" width="${w}" height="${PH}" fill="${c}" fill-opacity="${st.d ? 0.06 : 0.09}"><title>${esc(st.label)}</title></rect>`;
+    if (st.d >= rowsN) continue;
+    const y = 4 + st.d * LR, short = st.label.replace('Tls13', '').replace(/^wolfSSL_CTX_/, ''), fit = [st.label, short].find(l => l.length * 6.1 + 8 < w);
+    s += `<rect x="${x0}" y="${y}" width="${w}" height="${LR - 3}" rx="3" fill="${c}" fill-opacity="0.32"><title>${esc(st.label)}</title></rect>`;
+    if (fit) s += `<text x="${x0 + w / 2}" y="${y + 11}" text-anchor="middle" font-size="10.5" pointer-events="none">${esc(fit)}</text>`;
+  }
+  let lastEnd = -Infinity;
+  ref.evs.forEach((e, i) => {
+    if (e.ev !== 'mark' || isStep(e.label) || !e.label) return;
+    const x = px(ref.x[i]);
+    s += `<line x1="${x}" x2="${x}" y1="${T}" y2="${T + PH + 6}" class="axis" stroke-dasharray="2 3"><title>${esc(e.label)}</title></line>`;
+    const w = e.label.length * 5.6;
+    if (x >= lastEnd + 6 && x + w < W) { s += `<text class="mut" x="${x + 2}" y="${T + PH + 16}" font-size="10">${esc(e.label)}</text>`; lastEnd = x + w; }
+  });
+  s += `<line class="axis" x1="${L}" x2="${W - R}" y1="${T + PH}" y2="${T + PH}"/>`;
+  for (const v of ticks(xmin, xmax, 10)) {
+    s += `<text class="mut" x="${px(v)}" y="${T + PH + 34}" text-anchor="middle">${S.tx === 't' ? +v.toFixed(2) : Math.round(v).toLocaleString('en-US')}</text>`;
+  }
+  s += `<text class="mut" x="14" y="${T + PH / 2}" transform="rotate(-90 14 ${T + PH / 2})" text-anchor="middle">heap [kB]</text>`;
+  s += `<text class="mut" x="${L + (W - L - R) / 2}" y="${H - 4}" text-anchor="middle">${(S.tx === 't' ? 'time [ms]' : 'heap operations') + (aligned ? ', aligned at markers (widest trace per step)' : '')}</text>`;
+  const ctxl = series.flatMap(se => {
+    const i0 = se.evs.findIndex(e => e.label === 'ctx_ready'), i1 = se.evs.findIndex(e => e.label === 'ssl_freed');
+    return i0 < 0 || i1 < 0 ? [] : [{ se, x0: px(se.x[i0]), x1: px(se.x[i1]), y: py(se.s.ctxHeld) }];
+  }).sort((p, q) => p.y - q.y);
+  let ctxt = '';
+  for (const c of ctxl) {
+    s += `<line x1="${c.x0}" x2="${c.x1}" y1="${c.y}" y2="${c.y}" style="stroke:var(--t${c.se.ci})" stroke-opacity="0.6" stroke-dasharray="1 3"><title>Context held after ctx_ready</title></line>`;
+    ctxt += `<text x="${L + 8}" y="${T + 14 + 13 * ctxt.split('<text').length - 13}" font-size="10.5" style="fill:var(--t${c.se.ci})">┈ ${c.se.run} ${esc(c.se.s.chain)} · ${esc(c.se.s.kex)} · ${esc(c.se.s.auth)}: ctx ${esc(ctxText(c.se.s))}</text>`;
+  }
+  for (const se of series) {
+    let d = `M${px(se.x[0]).toFixed(1)},${py(0).toFixed(1)}`;
+    se.evs.forEach((e, i) => { d += `H${px(se.x[i]).toFixed(1)}V${py(e.heap).toFixed(1)}`; });
+    s += `<path d="${d}" fill="none" style="stroke:var(--t${se.ci})" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="${se.dash}"/>`;
+  }
+  s += ctxt;
+  s += `<line id="thover" x1="0" x2="0" y1="${T}" y2="${T + PH}" style="stroke:var(--fg)" stroke-opacity="0.35" visibility="hidden"/></svg>`;
+  $('tsvg').innerHTML = s;
+  const svg = $('tsvgel'), tip = $('tip'), hover = $('thover');
+  svg.onmouseleave = () => { tip.style.display = 'none'; hover.setAttribute('visibility', 'hidden'); };
+  svg.onmousemove = ev => {
+    const r = svg.getBoundingClientRect(), vx = (ev.clientX - r.left) / r.width * W;
+    if (vx < L || vx > W - R) { svg.onmouseleave(); return; }
+    const dx = xmin + (vx - L) / (W - L - R) * (xmax - xmin);
+    const rows = series.map(se => {
+      let lo = 0, hi = se.x.length - 1;
+      while (lo < hi) { const m = (lo + hi + 1) >> 1; if (se.x[m] <= dx) lo = m; else hi = m - 1; }
+      const e = se.evs[lo], open = [];
+      let phase = '';
+      for (let i = 0; i <= lo; i++) {
+        const f = se.evs[i];
+        if (f.ev === 'mark' && !isStep(f.label)) phase = f.label;
+        if (f.ev === 'mark' && isStep(f.label)) open.push(f.label);
+        else if (f.ev === 'end') { const j = open.lastIndexOf(f.label); if (j >= 0) open.splice(j, 1); }
+      }
+      const what = e.ev === 'mark' || e.ev === 'end' ? `${e.ev} ${e.label}` : `${e.ev} ${int(e.size)} B`;
+      return `<tr><td><span class="sw" style="background:var(--t${se.ci})"></span>${se.run}</td><td>${esc(se.s.chain)}</td>` +
+        `<td style="text-align:right"><b>${int(e.heap)} B</b></td><td>${esc(what)}</td><td style="text-align:right">${e.t.toFixed(2)} ms</td>` +
+        `<td class="st">#${lo} · ${esc(open.length ? open[open.length - 1] : 'after ' + phase)}</td></tr>`;
+    });
+    tip.innerHTML = `<table>${rows.join('')}</table>`;
+    tip.style.display = 'block';
+    const cx = ev.clientX - r.left, cy = ev.clientY - r.top;
+    tip.style.left = (cx + 16 + tip.offsetWidth > r.width ? Math.max(4, cx - 16 - tip.offsetWidth) : cx + 16) + 'px';
+    tip.style.top = Math.min(cy + 12, r.height - tip.offsetHeight - 4) + 'px';
+    hover.setAttribute('x1', vx); hover.setAttribute('x2', vx); hover.setAttribute('visibility', 'visible');
+  };
+}
+
+function renderTrace(dA, dB) {
+  const v = VIEWS.trace;
+  const mA = traceMap(dA), mB = dB?.trace?.length ? traceMap(dB) : null;
+  renderFilters([...mA.values()], v.keys);
+  const list = [...mA.values()].filter(a => passes(a, v.keys));
+  S.tsel = S.tsel.filter(k => mA.has(k) || mB?.has(k)).slice(0, NTRACE);
+  if (!S.tselInit && list.length) { S.tsel.push(list[0].key); S.tselInit = true; }
+  $('tcount').textContent = `${list.length} of ${mA.size} traces`;
+  $('thint').textContent = mB ? 'Run A solid, run B dashed. Hover for events.' : 'Hover the plot for individual events.';
+  $('txaxis').replaceChildren(...[['seq', 'Heap operations'], ['t', 'Time']].map(([k, l]) =>
+    el('button', { class: S.tx === k ? 'on' : '', onclick: () => { S.tx = k; render(); } }, l)));
+  $('talign').checked = S.talign;
+  $('tphase').checked = S.tphase;
+  renderTraceChips(mA, mB);
+  renderTraceTable(list, mB);
+  renderTracePlot(mA, mB);
+}
+
+function renderScatter(list, aggB) {
+  const v = VIEWS.alg, xs = [2, 3, 6, 7];
+  const show = new Set(list.map(a => a.variant)).size > 1;
+  $('spanel').hidden = !show;
+  if (!show) return;
+  if (!xs.includes(S.sx)) S.sx = 2;
+  $('sx').replaceChildren(...xs.map(i => el('option', { value: i }, v.cols[i].l)));
+  $('sx').value = S.sx;
+  const ser = new Map();
+  for (const a of list) {
+    const k = a.alg + ' ' + a.op;
+    if (!ser.has(k)) ser.set(k, []);
+    ser.get(k).push({ a, b: aggB?.get(a.key) });
+  }
+  const pts = [...ser.values()].flat().flatMap(({ a, b }) => [a, b].filter(Boolean)).filter(p => p[0] > 0 && p[S.sx] > 0);
+  if (!pts.length) { $('ssvg').innerHTML = '<div class="empty">No points with both values.</div>'; return; }
+  const W = 900, H = 380, L = 64, R = 150, T = 10, B = 40;
+  const ext = f => { const ys = pts.map(f); return [Math.min(...ys), Math.max(...ys)]; };
+  const scale = ([lo, hi], a, b) => {
+    if (S.log) { const l0 = Math.log(lo / 1.3), l1 = Math.log(hi * 1.3); return x => a + (Math.log(x) - l0) / (l1 - l0) * (b - a); }
+    return x => a + x / (hi * 1.1) * (b - a);
+  };
+  const [xl, xh] = ext(p => p[S.sx]), [yl, yh] = ext(p => p[0]);
+  const px = scale([xl, xh], L, W - R), py = scale([yl, yh], H - B, T);
+  const fx = v.cols[S.sx].f, logTicks = (lo, hi) => {
+    const out = [];
+    for (let e = Math.floor(Math.log10(lo / 1.3)); e <= Math.ceil(Math.log10(hi * 1.3)); e++)
+      for (const m of [1, 2, 5]) { const t = m * 10 ** e; if (t >= lo / 1.3 && t <= hi * 1.3) out.push(t); }
+    return out;
+  };
+  const tx = S.log ? logTicks(xl, xh) : ticks(0, xh * 1.1, 8), ty = S.log ? logTicks(yl, yh) : ticks(0, yh * 1.1, 6);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Time against ${v.cols[S.sx].l}">`;
+  for (const t of tx) s += `<line class="grid" x1="${px(t)}" x2="${px(t)}" y1="${T}" y2="${H - B}"/><text class="mut" x="${px(t)}" y="${H - B + 14}" text-anchor="middle">${fx(t)}</text>`;
+  for (const t of ty) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${py(t)}" y2="${py(t)}"/><text class="mut" x="${L - 6}" y="${py(t) + 4}" text-anchor="end">${ms(t)}</text>`;
+  s += `<text class="mut" x="${L + (W - L - R) / 2}" y="${H - 6}" text-anchor="middle">${esc(v.cols[S.sx].l)} [B]</text>`;
+  s += `<text class="mut" x="14" y="${T + (H - B - T) / 2}" transform="rotate(-90 14 ${T + (H - B - T) / 2})" text-anchor="middle">time median [ms]</text>`;
+  let ci = 0, ly = T + 8;
+  for (const [k, g] of ser) {
+    const c = `var(--t${ci++ % 6})`;
+    for (const side of ['a', 'b']) {
+      const ps = g.map(x => x[side]).filter(p => p && p[0] > 0 && p[S.sx] > 0).sort((p, q) => p[S.sx] - q[S.sx]);
+      if (ps.length > 1) s += `<polyline fill="none" style="stroke:${c}" stroke-opacity="0.45" stroke-width="1.4" ${side === 'b' ? 'stroke-dasharray="4 3"' : ''} points="${ps.map(p => `${px(p[S.sx]).toFixed(1)},${py(p[0]).toFixed(1)}`).join(' ')}"/>`;
+      for (const p of ps) {
+        const x = px(p[S.sx]), y = py(p[0]);
+        s += `<circle cx="${x}" cy="${y}" r="4.5" style="stroke:${c};fill:${side === 'a' ? c : 'var(--panel)'}" stroke-width="1.6"><title>${esc(`${k} · ${p.variant} (${side.toUpperCase()})\n${ms(p[0])} ms · ${fx(p[S.sx])} B`)}</title></circle>`;
+        s += `<text class="mut" x="${x + 7}" y="${y - 6}" font-size="10">${esc(p.variant)}</text>`;
+      }
+    }
+    if (ly < H - B) { s += `<circle cx="${W - R + 16}" cy="${ly - 4}" r="4" style="fill:${c}"/><text x="${W - R + 26}" y="${ly}">${esc(k)}</text>`; ly += 16; }
+  }
+  $('ssvg').innerHTML = s + '</svg>';
+}
+
+function renderGeneric(dA, dB) {
+  const v = VIEWS[S.view];
+  const aggA = aggregate(dA[S.view], v), aggB = dB?.[S.view]?.length ? aggregate(dB[S.view], v) : null;
+  const mi = S.metric[S.view] ?? 0;
+  const sel = $('metric');
+  sel.replaceChildren(...v.cols.map((c, i) => el('option', { value: i }, c.l + (c.u ? ` [${c.u}]` : ''))));
+  sel.value = mi;
+  $('log').checked = S.log;
+  renderFilters([...aggA.values()], v.keys);
+  const list = [...aggA.values()].filter(a => passes(a, v.keys));
+  const samples = list.reduce((s, a) => s + a.n, 0), fails = list.reduce((s, a) => s + a.fail, 0);
+  $('count').replaceChildren(`${list.length} of ${aggA.size} rows · ${int(samples)} ${v.unit} · `,
+    fails ? el('span', { class: 'pill bad' }, `${int(fails)} failed`) : '0 failed');
+  renderTable(list, aggB, mi);
+  if (S.view === 'alg') renderScatter(list, aggB);
+  else $('spanel').hidden = true;
+}
+
+function renderCards(dA, dB) {
+  $('cards').replaceChildren(...[['a', S.a, dA], ['b', S.b, dB]].filter(([, , d]) => d).map(([tag, run, d]) => {
+    const m = parseMeta(d.meta);
+    const scale = m.n_override > 0 ? `n=${m.n_override}` : m.scale == null ? null : +m.scale === 1 ? 'full' : `${+m.scale * 100}%`;
+    const kv = [['Platform', m.platform], ['Label', m.label], ['Date', m.date], ['Scale', scale], ['wolfSSL', m.wolfssl_git],
+      ['ese', m.ese_git], ['Falcon FPR', m.falcon_fpr], ['Heap trace', m.heap_trace === '1' ? 'yes' : null]].filter(([, x]) => x);
+    const fam = S.view === 'rtt' && tag === 'a' ? rttFamily(run).map(f => f.run.split('/')[1]).join(', ') : null;
+    const tls = d.tls.length, tfail = d.tls.filter(r => !VIEWS.tls.ok(r)).length, afail = d.alg.filter(r => !VIEWS.alg.ok(r)).length;
+    const scen = new Set(d.tls.map(r => [r.chain, r.kex, r.auth, r.dut_role].join('|'))).size;
+    return el('div', { class: 'card ' + tag }, el('div', { class: 'card-h' }, el('span', { class: 'tag ' + tag }, tag.toUpperCase()), el('b', { title: run }, run)),
+      el('div', { class: 'kv' }, kv.map(([k, x]) => el('span', {}, k, el('b', {}, x)))),
+      m.note || fam ? el('div', { class: 'hint' }, fam ? 'RTT family: ' + fam : m.note) : null,
+      el('div', { class: 'card-s' }, tls ? el('span', { class: 'pill' }, `${scen} scenarios · ${int(tls)} handshakes`) : null,
+        d.alg.length ? el('span', { class: 'pill' }, `${new Set(d.alg.map(r => r.alg + r.op)).size} operations`) : null,
+        d.trace.length ? el('span', { class: 'pill' }, `${int(d.trace.length)} trace events`) : null,
+        tfail + afail ? el('span', { class: 'pill bad' }, `${int(tfail + afail)} failed`) : el('span', { class: 'hint' }, 'no failures')),
+      el('details', {}, el('summary', {}, 'meta.txt'), el('pre', {}, d.meta.trim())));
+  }));
+}
+
+const RTTRE = /^(.*?)(?:-(iw\d+))?-(?:rtt(\d+)|alg)$/;
+const vorder = v => v === 'stock' ? 0 : +v.slice(2);
+const median = xs => quant(xs.filter(Number.isFinite).sort((x, y) => x - y), 0.5);
+
+function rttFamily(run) {
+  const i = run ? run.indexOf('/') : -1, m = i < 0 ? null : run.slice(i + 1).match(RTTRE);
+  if (!m) return [];
+  return S.runs.flatMap(r => {
+    const j = r.indexOf('/'), x = r.slice(j + 1).match(RTTRE);
+    return x && r.slice(0, j) === run.slice(0, i) && x[1] === m[1] ?
+      [{ run: r, variant: x[2] || 'stock', rtt: x[3] == null ? null : +x[3] }] : [];
+  }).sort((p, q) => (p.rtt ?? -1) - (q.rtt ?? -1) || vorder(p.variant) - vorder(q.variant));
+}
+
+// Operations the DUT runs in a scenario, for the compute-drift correction between TCP images.
+function dutOps(chain, auth, role) {
+  const [ca, leaf] = chain.includes('+') ? chain.split('+') : [null, chain];
+  const cert = ca === 'lms' ? 'lms_h15' : ca === 'xmss' ? 'xmss_h16' : leaf;
+  const ops = role === 'server' ? ['mlkem768|encap', leaf + '|sign'] : ['mlkem768|keygen', 'mlkem768|decap', cert + '|verify', leaf + '|verify'];
+  if (auth === 'mutual') ops.push(...(role === 'server' ? [cert + '|verify', leaf + '|verify'] : [leaf + '|sign']));
+  // ML-DSA signing retries make its median swing between runs; that is sampling, not drift.
+  return ops.filter(o => o !== 'mldsa44|sign');
+}
+
+function rttModel(fam) {
+  const tls = fam.filter(f => f.rtt != null), base = tls.find(f => f.variant === 'stock' && f.rtt === 0);
+  const med = new Map(), tcp = new Map(), alg = new Map(), keys = new Map();
+  for (const f of tls) {
+    const g = new Map(), rows = S.data[f.run].tls.filter(VIEWS.tls.ok);
+    for (const r of rows) {
+      const k = [r.chain, r.kex, r.auth, r.dut_role].join('|');
+      if (!g.has(k)) { g.set(k, []); keys.set(k, { key: k, chain: r.chain, kex: r.kex, auth: r.auth, dut_role: r.dut_role }); }
+      g.get(k).push(+r.ttfb_ns);
+    }
+    med.set(f.run, new Map([...g].map(([k, xs]) => [k, median(xs)])));
+    tcp.set(f.run, median(rows.map(r => +r.tcp_ns)));
+  }
+  for (const f of fam.filter(f => f.rtt == null)) {
+    const g = new Map();
+    for (const r of S.data[f.run].alg.filter(VIEWS.alg.ok)) {
+      const k = r.alg + '|' + r.op;
+      if (!g.has(k)) g.set(k, []);
+      g.get(k).push(+r.ns);
+    }
+    alg.set(f.variant, new Map([...g].map(([k, xs]) => [k, median(xs)])));
+  }
+  const drift = (variant, a) => {
+    const v = alg.get(variant), s0 = alg.get('stock');
+    if (!S.rdrift || !v || !s0 || variant === 'stock') return 0;
+    return dutOps(a.chain, a.auth, a.dut_role).reduce((s, o) => s + (v.has(o) && s0.has(o) ? v.get(o) - s0.get(o) : 0), 0);
+  };
+  const cell = (f, a) => {
+    const t = med.get(f.run)?.get(a.key), b = base && med.get(base.run)?.get(a.key);
+    if (t == null) return null;
+    if (!f.rtt || b == null) return { ttfb: t };
+    const b0 = b + drift(f.variant, a), d = tcp.get(f.run) - tcp.get(base.run);
+    return { ttfb: t, added: t - b0, extra: (t - b0) / d - 3, delay: d };
+  };
+  return { tls, base, keys, cell, hasAlg: alg.size > 1 };
+}
+
+function renderRttChart(list, model) {
+  const rtts = [...new Set(model.tls.map(f => f.rtt).filter(r => r > 0))];
+  if (!rtts.includes(S.rrtt)) S.rrtt = rtts.at(-1);
+  $('rrtt').replaceChildren(...rtts.map(r => el('button', { class: r === S.rrtt ? 'on' : '', onclick: () => { S.rrtt = r; render(); } }, `${r} ms`)));
+  const runs = model.tls.filter(f => f.rtt === S.rrtt), MAX = 40, shown = list.slice(0, MAX);
+  $('rhint').textContent = list.length > MAX ? `First ${MAX} of ${list.length} scenarios; filter to narrow.` : 'Values below 0 are DUT work that overlaps the wait.';
+  if (!shown.length || !model.base) { $('rsvg').innerHTML = '<div class="empty">No scenarios with a 0 ms baseline.</div>'; return; }
+  const op = i => runs.length < 2 ? 1 : 1 - 0.7 * i / (runs.length - 1);
+  const vals = shown.flatMap(a => runs.map(f => model.cell(f, a)?.extra)).filter(Number.isFinite);
+  const hi = Math.max(1, Math.ceil(Math.max(...vals)));
+  const L = 300, W = 900, R = 50, T = 34, bh = 8, gh = runs.length * (bh + 2) + 8, H = T + shown.length * gh + 30;
+  const x = v => L + Math.max(0, v) / hi * (W - L - R);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Extra round trips at ${S.rrtt} ms by scenario and TCP variant">`;
+  runs.forEach((f, i) => { s += `<rect x="${L + i * 110}" y="6" width="10" height="10" style="fill:var(--a)" fill-opacity="${op(i)}"/><text x="${L + 14 + i * 110}" y="15">${esc(f.variant)}</text>`; });
+  for (const t of ticks(0, hi, Math.min(hi, 10)))
+    s += `<line class="${t ? 'grid' : 'axis'}" x1="${x(t)}" x2="${x(t)}" y1="${T - 4}" y2="${H - 26}"/><text class="mut" x="${x(t)}" y="${H - 12}" text-anchor="middle">${t}</text>`;
+  shown.forEach((a, i) => {
+    const y = T + i * gh;
+    s += `<text x="${L - 8}" y="${y + gh / 2}" text-anchor="end">${esc(`${a.chain} · ${a.kex} · ${a.auth} · DUT ${a.dut_role}`)}</text>`;
+    runs.forEach((f, j) => {
+      const c = model.cell(f, a);
+      if (!c || !Number.isFinite(c.extra)) return;
+      const yy = y + 4 + j * (bh + 2);
+      s += `<rect x="${L}" y="${yy}" width="${Math.max(1, x(c.extra) - L)}" height="${bh}" style="fill:var(--a)" fill-opacity="${op(j)}"><title>${esc(`${a.chain} ${a.kex} ${a.auth} DUT ${a.dut_role}, ${f.variant} at ${f.rtt} ms: ${c.extra.toFixed(2)} extra round trips, TTFB ${ms(c.ttfb)} ms`)}</title></rect>`;
+      if (Math.abs(c.extra) >= 0.05) s += `<text class="mut" x="${x(c.extra) + 4}" y="${yy + bh - 1}" font-size="9">${c.extra.toFixed(1)}</text>`;
+    });
+  });
+  $('rsvg').innerHTML = s + '</svg>';
+}
+
+function renderRtt(dA) {
+  const fam = rttFamily(S.a), need = fam.map(f => f.run).filter(r => !S.data[r]);
+  if (need.length) {
+    $('loading').hidden = false;
+    $('loading').textContent = `Loading ${need.length} runs of this RTT family …`;
+    Promise.all(need.map(load)).then(() => { $('loading').hidden = true; render(); });
+    return;
+  }
+  const model = rttModel(fam), v = VIEWS.rtt;
+  $('rmet').replaceChildren(...[['extra', 'Extra round trips'], ['added', 'Added time'], ['ttfb', 'TTFB']].map(([k, l]) =>
+    el('button', { class: S.rmet === k ? 'on' : '', onclick: () => { S.rmet = k; render(); } }, l)));
+  $('rdrift').checked = S.rdrift;
+  $('rdrift').disabled = !model.hasAlg;
+  $('rdrift').parentElement.title = model.hasAlg ? 'Subtract each TCP image\'s per-operation compute difference, from its -alg run' : 'No -alg runs in this family';
+  const items = [...model.keys.values()];
+  renderFilters(items, v.keys);
+  const list = items.filter(a => passes(a, v.keys)).sort((p, q) => v.keys.reduce((c, k) => c || natCmp(p[k], q[k]), 0));
+  $('rcount').textContent = `${list.length} of ${items.length} scenarios · ${model.tls.length} runs` + (model.base ? '' : ' · no stock 0 ms baseline');
+  const cols = model.tls;
+  const heads = [...v.keys.map(k => ({ l: KEYLBL[k], txt: true })),
+    ...cols.map(f => ({ l: `${f.variant} ${f.rtt} ms`, u: f.rtt && S.rmet === 'extra' ? 'round trips' : 'ms' }))];
+  const rows = list.map(a => ({ a, c: [...v.keys.map(k => a[k]), ...cols.map(f => {
+    const c = model.cell(f, a);
+    return c == null ? null : !f.rtt || S.rmet === 'ttfb' ? c.ttfb : S.rmet === 'added' ? c.added : c.extra;
+  })] }));
+  sortRows(rows, S.sort.rtt);
+  const nk = v.keys.length, body = el('tbody');
+  if (!rows.length) body.append(el('tr', {}, el('td', { colspan: heads.length, class: 'empty' }, 'No rows match the filters.')));
+  for (const { c } of rows) body.append(el('tr', {}, c.map((x, i) => {
+    if (i < nk) return el('td', { class: 'txt' }, x);
+    const f = cols[i - nk];
+    if (x == null || !Number.isFinite(x)) return el('td', {}, '');
+    if (!f.rtt || S.rmet !== 'extra') return el('td', {}, ms(x));
+    return el('td', { class: 'heat', style: `--h:${Math.max(0, Math.min(60, x * 9)).toFixed(0)}` }, Math.abs(x) < 0.05 ? '0.0' : (x > 0 ? '+' : '') + x.toFixed(1));
+  })));
+  $('table').replaceChildren(el('thead', {}, headRow(heads, -1)), body);
+  renderRttChart(list, model);
+}
+
+function renderTabs() {
+  $('tabs').replaceChildren(...Object.entries(VIEWS).map(([k, x]) => {
+    const n = runsFor(k, null).length;
+    return el('button', { class: k === S.view ? 'on' : '', disabled: !n, title: `${n} data set${n === 1 ? '' : 's'}`,
+      onclick: () => { if (k !== S.view) { S.view = k; S.sel = null; fillRuns(); pick(); } } }, x.label, n ? el('span', { class: 'cnt' }, n) : null);
+  }));
+}
+
+// A and B offer only the runs that carry the selected category.
+function fillRuns() {
+  const rs = runsFor(S.view), ra = $('runA'), rb = $('runB');
+  if (!rs.includes(S.a)) S.a = rs[rs.length - 1] || '';
+  if (S.view === 'rtt' || !rs.includes(S.b)) S.b = '';
+  const opts = none => {
+    const out = none ? [el('option', { value: '' }, '(none)')] : [];
+    for (const board of [...new Set(rs.map(r => r.split('/')[0]))])
+      out.push(el('optgroup', { label: board }, rs.filter(r => r.startsWith(board + '/')).map(r => el('option', { value: r, title: S.notes[r] },
+        S.view === 'rtt' ? r.replace(RTTRE, '$1') : r))));
+    return out;
+  };
+  ra.replaceChildren(...opts(false)); rb.replaceChildren(...opts(true));
+  ra.value = S.a; rb.value = S.b;
+  $('runBl').hidden = $('swap').hidden = S.view === 'rtt';
+  const rtts = [...new Set(runsFor(S.view, null).map(rttOf))].sort((x, y) => x - y);
+  $('trtt').hidden = !BYRTT.includes(S.view);
+  $('trtt').replaceChildren(...rtts.map(v => el('button', { class: v === S.trtt ? 'on' : '', title: `${runsFor(S.view, v).length} data sets`,
+    onclick: () => { if (v !== S.trtt) { S.trtt = v; fillRuns(); pick(); } } }, `${v} ms`)));
+}
+
+function saveHash() {
+  const p = new URLSearchParams();
+  if (S.a) p.set('a', S.a);
+  if (S.b) p.set('b', S.b);
+  p.set('v', S.view);
+  const ex = Object.entries(S.excl).filter(([, s]) => s.size).map(([k, s]) => k + ':' + [...s].join(',')).join(';');
+  if (ex) p.set('x', ex);
+  if (S.q.trim()) p.set('q', S.q.trim());
+  if (S.metric[S.view]) p.set('m', S.metric[S.view]);
+  const so = S.sort[S.view];
+  if (so) p.set('s', so.i + (so.dir < 0 ? 'd' : 'a'));
+  if (!S.log) p.set('lin', '1');
+  if (S.view === 'alg' && S.sx !== 2) p.set('sx', S.sx);
+  if (BYRTT.includes(S.view) && S.trtt) p.set('tr', S.trtt);
+  if (S.view === 'rtt') {
+    if (S.rrtt) p.set('rr', S.rrtt);
+    if (S.rmet !== 'extra') p.set('rm', S.rmet);
+    if (!S.rdrift) p.set('rd', '0');
+  }
+  if (S.view === 'trace') {
+    if (S.tsel.length) p.set('t', S.tsel.join('~'));
+    if (S.tx !== 'seq') p.set('tx', S.tx);
+    if (!S.talign) p.set('ta', '0');
+    if (!S.tphase) p.set('tp', '0');
+  }
+  history.replaceState(null, '', '#' + p.toString());
+}
+
+function readHash() {
+  const h = location.hash.slice(1);
+  if (!h) return;
+  if (!h.includes('=')) { [S.a, S.b = ''] = h.split('&').map(decodeURIComponent); return; }
+  const p = new URLSearchParams(h);
+  S.a = p.get('a') || ''; S.b = p.get('b') || '';
+  if (VIEWS[p.get('v')]) S.view = p.get('v');
+  for (const part of (p.get('x') || '').split(';').filter(Boolean)) {
+    const i = part.indexOf(':');
+    S.excl[part.slice(0, i)] = new Set(part.slice(i + 1).split(','));
+  }
+  S.q = p.get('q') || '';
+  if (p.get('m')) S.metric[S.view] = +p.get('m');
+  const s = p.get('s')?.match(/^(\d+)([ad])$/);
+  if (s) S.sort[S.view] = { i: +s[1], dir: s[2] === 'd' ? -1 : 1 };
+  S.log = p.get('lin') !== '1';
+  if (p.get('sx')) S.sx = +p.get('sx');
+  if (p.has('t')) { S.tsel = p.get('t').split('~').filter(Boolean); S.tselInit = true; }
+  if (p.get('tx') === 't') S.tx = 't';
+  S.talign = p.get('ta') !== '0';
+  if (p.get('rr')) S.rrtt = +p.get('rr');
+  if (p.get('tr')) S.trtt = +p.get('tr');
+  if (['added', 'ttfb'].includes(p.get('rm'))) S.rmet = p.get('rm');
+  S.rdrift = p.get('rd') !== '0';
+  S.tphase = p.get('tp') !== '0';
+}
+
+function render() {
+  const dA = S.data[S.a], dB = S.b ? S.data[S.b] : null;
+  renderTabs();
+  renderCards(dA, dB);
+  const isTrace = S.view === 'trace', isRtt = S.view === 'rtt';
+  document.body.classList.toggle('trace', isTrace);
+  $('genctl').hidden = isTrace || isRtt || !dA;
+  $('trctl').hidden = !isTrace || !dA;
+  $('rctl').hidden = $('rpanel').hidden = !isRtt || !dA;
+  if (!isTrace) { $('tpanel').hidden = true; $('tsel').hidden = true; }
+  if (isTrace || isRtt) $('spanel').hidden = true;
+  if (document.activeElement !== $('q')) $('q').value = S.q;
+  if (dA) isTrace ? renderTrace(dA, dB) : isRtt ? renderRtt(dA) : renderGeneric(dA, dB);
+  saveHash();
+}
+
+async function pick() {
+  S.a = $('runA').value;
+  S.b = $('runB').value;
+  const need = [S.a, S.b].filter(r => r && !S.data[r]);
+  if (need.length) {
+    $('loading').hidden = false;
+    $('loading').textContent = 'Loading ' + need.join(' and ') + ' …';
+    await Promise.all(need.map(load));
+    $('loading').hidden = true;
+  }
+  render();
+}
+
+function applyTheme(t) {
+  if (t === 'auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', t);
+  $('theme').textContent = { auto: '◐ Auto', light: '☀ Light', dark: '☾ Dark' }[t];
+  $('theme').dataset.t = t;
+}
+
+(async () => {
+  let theme = 'auto';
+  try { theme = localStorage.getItem('ese-theme') || 'auto'; } catch (e) { }
+  applyTheme(theme);
+  $('theme').onclick = () => {
+    const t = { auto: 'light', light: 'dark', dark: 'auto' }[$('theme').dataset.t];
+    applyTheme(t);
+    try { localStorage.setItem('ese-theme', t); } catch (e) { }
+  };
+  if (innerWidth < 900) document.body.classList.add('noside');
+  $('sidebtn').onclick = () => document.body.classList.toggle('noside');
+  readHash();
+  S.runs = await findRuns();
+  const ra = $('runA'), rb = $('runB');
+  if (!S.runs.length) { $('loading').hidden = false; $('loading').textContent = 'No runs found under results/.'; return; }
+  if (!runsFor(S.view).length) S.view = Object.keys(VIEWS).find(k => runsFor(k).length);
+  // Old links name any run of an RTT family; the list holds its lowest-RTT run.
+  if (S.view === 'rtt' && S.a && rttRuns(S.a).length) S.a = rttRuns(S.a)[0].run;
+  if (BYRTT.includes(S.view) && S.runs.includes(S.a)) S.trtt = rttOf(S.a);
+  fillRuns();
+  ra.onchange = rb.onchange = pick;
+  $('swap').onclick = () => { if (!rb.value) return; [ra.value, rb.value] = [rb.value, ra.value]; pick(); };
+  $('metric').onchange = () => { S.metric[S.view] = +$('metric').value; render(); };
+  $('log').onchange = () => { S.log = $('log').checked; render(); };
+  $('sx').onchange = () => { S.sx = +$('sx').value; render(); };
+  $('talign').onchange = () => { S.talign = $('talign').checked; render(); };
+  $('tphase').onchange = () => { S.tphase = $('tphase').checked; render(); };
+  $('rdrift').onchange = () => { S.rdrift = $('rdrift').checked; render(); };
+  $('q').oninput = () => { S.q = $('q').value; render(); };
+  $('freset').onclick = () => { S.excl = {}; S.q = ''; render(); };
+  await pick();
+})();
+</script>
+</body>
+</html>

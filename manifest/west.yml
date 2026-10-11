@@ -1,0 +1,42 @@
+manifest:
+  remotes:
+    - name: zephyr
+      url-base: https://github.com/zephyrproject-rtos
+    - name: github_frauschi
+      url-base: https://github.com/Frauschi
+    - name: github_nxp
+      url-base: https://github.com/NXP
+  projects:
+    # Zephyr 4.4.1 plus the configurable initial TCP window (patches/) and two FRDM-RW612 board fixes.
+    - name: zephyr
+      remote: github_frauschi
+      repo-path: zephyr
+      revision: 293d8738dd28f23b58bf31f7702bfcce250d5b30
+      import:
+        name-allowlist:
+          - picolibc
+          - cmsis_6
+          - hal_stm32
+          - mbedtls
+          - tf-psa-crypto
+          - cmsis
+          - hal_nxp
+    # Branch ese_2026: wolfSSL master plus the pending memory and speed changes listed in patches/README.md.
+    - name: wolfssl
+      path: modules/crypto/wolfssl
+      revision: c065d363af2f39edec926e18c868e1632d5be74a
+      remote: github_frauschi
+    - name: wolfPSA
+      path: modules/crypto/wolfPSA
+      revision: 1872bb395fa1df2e859209d5675dbc5f59e16234
+      remote: github_frauschi
+    # Only for the optional rw612-els target, which the paper does not use.
+    - name: els_pkc
+      revision: c37a05831caf542ff240c3cb6a54da469d5e3c57
+      path: modules/crypto/els_pkc
+      remote: github_nxp
+    # Part of the measured module set; no build here uses it.
+    - name: wolfCert
+      revision: 47a0d72292ffb48c7165c55589f4959dc0354281
+      remote: github_frauschi
+      path: modules/crypto/wolfCert

@@ -1,0 +1,6 @@
+/.west/
+/zephyr/
+/modules/
+/build*/
+__pycache__/
+paper/out/

@@ -1,0 +1,101 @@
+note=TLS rows rerun from 2026-10-10 20:25 with an unpinned ese_host; the earlier TLS blocks below belong to rows discarded because ese_host ran pinned by taskset next to the netem spin loops (1-2 ms host wake-up delay); the alg rows are from the first pass, timed on the DUT
+date=Sat Oct 10 17:16:04 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=0 heap_trace=0 host_port=4402 rtt_ms=-1 group_msgs=0
+
+date=Sat Oct 10 17:30:29 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=0 heap_trace=0 host_port=4402 rtt_ms=-1 group_msgs=0
+
+date=Sat Oct 10 17:33:10 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=100 heap_trace=0 host_port=4402 rtt_ms=-1 group_msgs=0
+
+date=Sat Oct 10 17:34:58 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=0 heap_trace=0 host_port=4402 rtt_ms=-1 group_msgs=0
+
+date=Sat Oct 10 17:53:04 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=50 heap_trace=0 host_port=4402 rtt_ms=-1 group_msgs=0
+
+date=Sat Oct 10 18:02:14 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=10 heap_trace=0 host_port=4402 rtt_ms=-1 group_msgs=0
+
+date=Sat Oct 10 18:44:02 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=0 heap_trace=0 host_port=4402 rtt_ms=0 group_msgs=0
+
+date=Sat Oct 10 20:26:22 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=0 heap_trace=0 host_port=4402 rtt_ms=0 group_msgs=0
+
+date=Sun Oct 11 02:20:59 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=50 heap_trace=0 host_port=4402 rtt_ms=0 group_msgs=0
+
+date=Sun Oct 11 08:18:23 2026
+label=rw612
+dut_ip=192.168.0.2
+host_ip=192.168.0.1
+dut_hello=OK platform=frdm_rw612/rw612 wolfssl=5.9.4 cpu_hz=1000000 build=3fe0f20/wolfssl-v5.9.0-stable-5742-gc065d363a stack_base=256 stack_selftest_2048=2048 falcon_fpr=emulated hw_crypto=0 trace=0 pqc_profile=smallmem tcp_ca=iw1-ss3
+host=linux host_wolfssl=5.9.4 host_falcon_fpr=neon
+ese_git=3fe0f20
+wolfssl_git=v5.9.0-stable-5742-gc065d363a
+scale=1 n_override=10 heap_trace=0 host_port=4402 rtt_ms=0 group_msgs=0
+

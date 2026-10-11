@@ -1,0 +1,4 @@
+platform,chain,ca_alg,leaf_alg,kex,auth,dut_role,iter,n,dut_status,host_status,ttfb_ns,tcp_ns,client_hs_ns,server_hs_ns,server_total_ns,c2s_bytes,s2c_bytes,dut_heap_peak,dut_heap_total,dut_heap_allocs,dut_stack
+h743-fpu,mldsa44,mldsa44,mldsa44,mlkem768,server,server,0,3,0,0,605311917,100370042,504726625,405268946,405399033,1494,12293,22677,39922,39,1996
+h743-fpu,mldsa44,mldsa44,mldsa44,mlkem768,server,server,1,3,0,0,605312000,100331375,504727083,405154902,405285179,1494,12293,22677,39922,39,1996
+h743-fpu,mldsa44,mldsa44,mldsa44,mlkem768,server,server,2,3,0,0,605282417,100343417,504693667,405233310,405363912,1494,12293,22677,39922,39,1996

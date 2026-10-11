@@ -1,0 +1,24 @@
+config ESE_MEAS_STACK_SIZE
+	int "Stack size of the measured TLS/benchmark thread"
+	default 32768
+
+config ESE_MEAS_THREAD_PRIO
+	int "Priority of the measured TLS/benchmark thread"
+	default 5
+
+config ESE_FALCON_FPR_DOUBLE
+	bool "Falcon on the hardware double-precision FPU"
+	depends on CPU_HAS_FPU_DOUBLE_PRECISION && FPU
+
+rsource "Kconfig.pqc"
+
+config ESE_HEAP_TRACE
+	bool "Heap-event trace with handshake markers (trace builds only)"
+
+config ESE_TRACE_EVENTS
+	int "Heap trace buffer size in events (12 bytes each)"
+	depends on ESE_HEAP_TRACE
+	default 10240 if SOC_SERIES_STM32H7X
+	default 12288
+
+source "Kconfig.zephyr"

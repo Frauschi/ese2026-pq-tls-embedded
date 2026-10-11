@@ -1,0 +1,97 @@
+From 293d8738dd28f23b58bf31f7702bfcce250d5b30 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tobias=20Frauenschl=C3=A4ger?= <tobias@wolfssl.com>
+Date: Sun, 4 Oct 2026 13:00:36 +0200
+Subject: [PATCH] net: tcp: make the initial congestion window and ssthresh
+ configurable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The New Reno implementation starts every connection with a congestion
+window of 1 MSS and a slow start threshold of 3 MSS, both hardcoded.
+Above about 4 KB the window then grows by roughly one segment per
+round trip, so a TLS 1.3 server flight with post-quantum certificates
+(12 KB for ML-DSA-44, 54 KB for SLH-DSA-128f) needs several round
+trips that Linux, with an initial window of 10 segments, does not.
+Measured on an FRDM-RW612 at 100 ms RTT, an ML-DSA-44 handshake takes
+653 ms with the defaults and 398 ms with an initial window of 10.
+
+Add CONFIG_NET_TCP_CONGESTION_INITIAL_WIN and
+CONFIG_NET_TCP_CONGESTION_INITIAL_SSTHRESH, in segments, with the old
+values as defaults. An ssthresh of 0 starts it at the largest window,
+as RFC 5681 recommends. Both values are clamped to the 16-bit window.
+
+Signed-off-by: Tobias Frauenschläger <t.frauenschlaeger@me.com>
+---
+ subsys/net/ip/Kconfig.tcp | 20 ++++++++++++++++++++
+ subsys/net/ip/tcp.c       | 15 +++++++++++----
+ 2 files changed, 31 insertions(+), 4 deletions(-)
+
+diff --git a/subsys/net/ip/Kconfig.tcp b/subsys/net/ip/Kconfig.tcp
+index ceee9cbc36c..743950f3111 100644
+--- a/subsys/net/ip/Kconfig.tcp
++++ b/subsys/net/ip/Kconfig.tcp
+@@ -168,6 +168,26 @@ config NET_TCP_CONGESTION_AVOIDANCE
+ 	  To avoid overstressing a link reduce the transmission rate as soon as
+ 	  packets are starting to drop.
+ 
++config NET_TCP_CONGESTION_INITIAL_WIN
++	int "Initial congestion window in segments"
++	default 1
++	range 1 44
++	depends on NET_TCP_CONGESTION_AVOIDANCE
++	help
++	  Initial congestion window in MSS-sized segments. RFC 3390 allows
++	  up to 3 segments for an MSS of 1460 bytes, RFC 6928 allows 10.
++	  The window is held in 16 bits, which limits it to 44 segments.
++
++config NET_TCP_CONGESTION_INITIAL_SSTHRESH
++	int "Initial slow start threshold in segments"
++	default 3
++	range 0 44
++	depends on NET_TCP_CONGESTION_AVOIDANCE
++	help
++	  Initial slow start threshold in MSS-sized segments. 0 sets it to
++	  the largest window, as RFC 5681 recommends, so slow start runs
++	  until the first loss.
++
+ config NET_TCP_KEEPALIVE
+ 	bool "TCP keep-alive support"
+ 	help
+diff --git a/subsys/net/ip/tcp.c b/subsys/net/ip/tcp.c
+index 7f14e55caf0..4e52d6ce3bc 100644
+--- a/subsys/net/ip/tcp.c
++++ b/subsys/net/ip/tcp.c
+@@ -66,9 +66,11 @@ static int tcp_tx_window =
+ #define TCP_RTO_MS (tcp_rto)
+ #endif
+ 
++#ifdef CONFIG_NET_TCP_CONGESTION_AVOIDANCE
+ /* Define the number of MSS sections the congestion window is initialized at */
+-#define TCP_CONGESTION_INITIAL_WIN 1
+-#define TCP_CONGESTION_INITIAL_SSTHRESH 3
++#define TCP_CONGESTION_INITIAL_WIN CONFIG_NET_TCP_CONGESTION_INITIAL_WIN
++#define TCP_CONGESTION_INITIAL_SSTHRESH CONFIG_NET_TCP_CONGESTION_INITIAL_SSTHRESH
++#endif
+ 
+ static sys_slist_t tcp_conns = SYS_SLIST_STATIC_INIT(&tcp_conns);
+ 
+@@ -507,8 +509,13 @@ static void tcp_new_reno_log(struct tcp *conn, char *step)
+ 
+ static void tcp_new_reno_init(struct tcp *conn)
+ {
+-	conn->ca.cwnd = conn_mss(conn) * TCP_CONGESTION_INITIAL_WIN;
+-	conn->ca.ssthresh = conn_mss(conn) * TCP_CONGESTION_INITIAL_SSTHRESH;
++	conn->ca.cwnd = MIN(conn_mss(conn) * TCP_CONGESTION_INITIAL_WIN, UINT16_MAX);
++	if (TCP_CONGESTION_INITIAL_SSTHRESH == 0) {
++		conn->ca.ssthresh = UINT16_MAX;
++	} else {
++		conn->ca.ssthresh = MIN(conn_mss(conn) * TCP_CONGESTION_INITIAL_SSTHRESH,
++					UINT16_MAX);
++	}
+ 	conn->ca.pending_fast_retransmit_bytes = 0;
+ 	tcp_new_reno_log(conn, "init");
+ }
+-- 
+2.53.0
+
