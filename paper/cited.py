@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Prints every number the paper cites, from the 2026-10-10 campaign, in the order the paper uses them."""
+"""Prints every number the paper cites, from the 2026-10-10 campaign and the 2026-10-11 baselines,
+in the order the paper uses them."""
 import os
 
 import numpy as np
@@ -19,11 +20,11 @@ RTT = {"rw612 stock": ("rw612/20261010-rw612-rtt0", "rw612/20261010-rw612-rtt{}"
        "rw612 iw10": ("rw612/20261010-rw612-iw10-rtt0", "rw612/20261010-rw612-iw10-rtt{}"),
        "h743 stock": ("h743/20261010-h743-fpu-rtt0", "h743/20261010-h743-fpu-rtt{}"),
        "h743 iw10": ("h743/20261010-h743-fpu-iw10-rtt0", "h743/20261010-h743-fpu-iw10-rtt{}"),
-       "h743 iw10+rto1s": ("h743/20261010-h743-fpu-iw10-rtt0",
-                           "h743/20261010-h743-fpu-iw10-rto1000-rtt{}"),
+       "h743 iw10+rto1s": ("h743/20261011-h743-fpu-iw10-rto1000-rtt0",
+                           "h743/20261011-h743-fpu-iw10-rto1000-rtt{}"),
        "rpi3": ("rpi3/20261010-rpi3-rtt0", "rpi3/20261010-rpi3-rtt{}"),
        "rpi5": ("rpi5/20261010-rpi5-rtt0", "rpi5/20261010-rpi5-rtt{}"),
-       "rpi5 grouped": ("rpi5/20261010-rpi5-rtt0", "rpi5/20261010-rpi5-grp-rtt{}")}
+       "rpi5 grouped": ("rpi5/20261011-rpi5-grp-rtt0", "rpi5/20261010-rpi5-grp-rtt{}")}
 TRACE = "rw612/20261010-heap-trace"
 FOOT = "rw612/20261010-rw612"
 SIG = {"ecdsa_p256": 71, "rsa3072": 384, "mldsa44": 2420, "falcon512": 655,
@@ -183,6 +184,15 @@ def main():
                         {"/".join(k): f"{x.loc[k, 'ttfb']:.0f} / {x.loc[k, 'extra']:.2f} (n={x.loc[k, 'n']})"
                          for k in sel}))
 
+    fig3 = [(n, 100, "server", "server") for n in ("rw612 stock", "rw612 iw10", "rpi3")]
+    fig3 += [(n, 600, "mutual", "client") for n in ("h743 stock", "h743 iw10", "h743 iw10+rto1s", "rpi3")]
+    for name, delay, au, ro in fig3:
+        d = pd.read_csv(os.path.join(RES, RTT[name][1].format(delay), "tls.csv"))
+        d = d[(d.dut_status == 0) & (d.host_status == 0) & (d.kex == "mlkem768") & (d.auth == au)
+              & (d.dut_role == ro)]
+        g = d.groupby("chain").ttfb_ns
+        iqr = (g.quantile(0.75) - g.quantile(0.25)) / g.median() * 100
+        out.append((f"Fig 3 {name} {delay} ms IQR as % of median", iqr.round(1).to_dict()))
     for p in ("rw612", "h743", "rpi3", "rpi5"):
         d = pd.read_csv(os.path.join(RES, TLS[p], "tls.csv"))
         g = d[(d.dut_status == 0) & (d.host_status == 0)].groupby(

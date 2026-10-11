@@ -2,6 +2,7 @@
 """Summarizes a DUT-link capture per TCP connection: data segments per direction grouped into
 rounds, and retransmitted DUT segments."""
 import argparse
+import math
 import struct
 from collections import defaultdict
 
@@ -36,6 +37,8 @@ def main():
     ap.add_argument("--dut", required=True)
     ap.add_argument("--gap-ms", type=float, default=20.0,
                     help="a pause longer than this starts a new round")
+    ap.add_argument("--mss", type=int,
+                    help="count DUT frames larger than this as several segments (host GRO)")
     a = ap.parse_args()
     conns = defaultdict(list)
     for p in packets(a.pcap):
@@ -50,15 +53,16 @@ def main():
             if plen <= 0:
                 continue
             d = "dut" if src == a.dut else "host"
+            n = math.ceil(plen / a.mss) if a.mss and d == "dut" else 1
             if d == "dut":
                 if (seq, plen) in seen:
                     retx.append(round((ts - t0) * 1000))
                 seen.add((seq, plen))
             if rounds and rounds[-1][0] == d and (ts - last) * 1000 < a.gap_ms:
-                rounds[-1][1] += 1
+                rounds[-1][1] += n
                 rounds[-1][2] += plen
             else:
-                rounds.append([d, 1, plen, round((ts - t0) * 1000)])
+                rounds.append([d, n, plen, round((ts - t0) * 1000)])
             last = ts
         print(f"conn {i} dut port {key[0]}: " + "; ".join(
             f"{d} {n} seg {b} B @{t} ms" for d, n, b, t in rounds))

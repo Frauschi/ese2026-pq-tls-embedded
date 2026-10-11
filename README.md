@@ -1,6 +1,6 @@
 # Post-quantum TLS on embedded devices: measurement artifact
 
-This repository is the artifact of the ESE Kongress 2026 paper *Post-Quantum TLS on Embedded Devices: What It Costs* (Tobias Frauenschläger, wolfSSL Inc.). It holds the measurement framework, the pinned build configuration and patches, the raw data of the 2026-10-10 campaign and the 2026-10-11 packet captures, and the scripts that draw the paper's figures and print every number it cites. It is a snapshot of the working repository; see [Reproducing the paper](#reproducing-the-paper).
+This repository is the artifact of the ESE Kongress 2026 paper *Post-Quantum TLS on Embedded Devices: What It Costs* (Tobias Frauenschläger, wolfSSL Inc.). It holds the measurement framework, the pinned build configuration and patches, the raw data of the 2026-10-10 campaign and the 2026-10-11 packet captures and baselines, and the scripts that draw the paper's figures and print every number it cites. It is a snapshot of the working repository; see [Reproducing the paper](#reproducing-the-paper).
 
 The framework measures wolfSSL's post-quantum algorithms on embedded systems: raw algorithm performance, TLS 1.3 time to first byte (TTFB), and heap and stack usage during both. The same C core runs as a Zephyr application on the NXP FRDM-RW612 and the ST NUCLEO-H743ZI and as a Linux binary on a Raspberry Pi 3B+ and a Raspberry Pi 5. A host helper plays the TLS peer and writes CSVs.
 
@@ -148,7 +148,9 @@ Zephyr also retransmits after a fixed 200 ms, randomized up to 300 ms, without e
 
 `campaigns/20261010/` holds the scripts behind the `20261010` result sets. `build-all.sh` builds every image; `run-rw612.sh`, `run-h743.sh` and `run-pi.sh rpi3|rpi5` then measure one board each and run in parallel, each at its own RTT through `netem.sh set`, and `run-h743-rto.sh` follows `run-h743.sh` with the 1 s RTO image. They expect the network above, `west` on the `PATH` or in `$WEST`, and the Zephyr SDK in `$ZEPHYR_SDK_INSTALL_DIR`, and log to `$ESE_CAMPAIGN_LOGS` (default `~/ese-campaign-logs`). The first pass ran `ese_host` pinned with `taskset`, so `run-rerun.sh` repeated the affected TLS runs; a fresh run needs only the `run-*.sh` scripts without it. Check the output with `scripts/check_results.py results/*/20261010-*`.
 
-`campaigns/20261011-traces/run-traces.sh` records the packet captures behind the paper's TCP explanations: the H743 with stock, IW10 and IW10 + 1 s RTO TCP and the Pi 3B+, three ML-DSA-44 handshakes per case, into `results/*/20261011-trace-*/capture.pcap`. It needs `tcpdump` with `cap_net_raw` and `cap_net_admin`. Summarize a capture with `scripts/pcap_flights.py <pcap> --dut <ip>`; the host's GRO and TSO merge its packet counts, while byte counts and timing are exact.
+`campaigns/20261011-traces/run-traces.sh` records the packet captures behind the paper's TCP explanations: the H743 with stock, IW10 and IW10 + 1 s RTO TCP and the Pi 3B+, three ML-DSA-44 handshakes per case, into `results/*/20261011-trace-*/capture.pcap`. It needs `tcpdump` with `cap_net_raw` and `cap_net_admin`. Summarize a capture with `scripts/pcap_flights.py <pcap> --dut <ip> [--mss <B>]`. tcpdump runs on the host's interface, so it records the DUT's packets on arrival, before netem delays them, and the host's packets as they leave. The host's GRO merges consecutive DUT segments into one frame and its TSO sends oversized frames of its own, so frame counts understate segment counts; `--mss` splits DUT frames back into segments (1460 for Zephyr, 1448 for Linux with TCP timestamps). Byte counts and timing are exact.
+
+`campaigns/20261011-baselines/run-baselines.sh` measures the 0 ms baselines that the `20261010` set lacks: the H743 1 s RTO image at 0, 100 and 600 ms in one session, so that all three share one build, and the Pi 5 with `--group-messages` at 0 ms.
 
 ## Output
 
@@ -227,7 +229,7 @@ When the DUT is the client, TTFB includes the host's server-side work; `server_h
 
 ## Reproducing the paper
 
-`results/` holds every run the paper uses: `results/<board>/20261010-*` from the 2026-10-10 campaign and `results/<board>/20261011-trace-*` with the packet captures. Each run's `meta.txt` records the DUT image, revisions and options, and `note=` lines where a run needs a remark. `scripts/check_results.py results/*/2026101*` reports sample counts, failures and off-RTT connects for all of them.
+`results/` holds every run the paper uses: `results/<board>/20261010-*` from the 2026-10-10 campaign, `results/<board>/20261011-trace-*` with the packet captures, and the 2026-10-11 baseline runs. The paper's 1 s RTO numbers come from `results/h743/20261011-h743-fpu-iw10-rto1000-*`, which repeats `20261010-h743-fpu-iw10-rto1000-*` with a matching 0 ms baseline. Each run's `meta.txt` records the DUT image, revisions and options, and `note=` lines where a run needs a remark. `scripts/check_results.py results/*/2026101*` reports sample counts, failures and off-RTT connects for all of them.
 
 To redraw the figures and recompute the cited numbers from the data, with Python 3, pandas, NumPy and Matplotlib:
 

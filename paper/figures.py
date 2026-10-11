@@ -225,7 +225,7 @@ def extra_rtts(base_run, run):
 
 RTT_CHAINS = ["ecdsa_p256", "rsa3072", "falcon512", "lms+mldsa44", "mldsa44",
               "lms+slhdsa_sha2_128f", "slhdsa_sha2_128f"]
-RTT_LIMITS = [(4.5, "\u2193 > 10 segments (14.6 kB)"), (5.5, "\u2193 > 32 KiB send window")]
+RTT_LIMITS = [(4.5, "\u2193 > 14.6 kB (10 \u00d7 MSS)"), (5.5, "\u2193 > 32 KiB send window")]
 TCP_STYLE = {
     "stock": ("Zephyr TCP, stock (initial window 1 segment)", INK, "o", "none", -0.3),
     "iw10": ("Zephyr TCP, initial window 10 segments", "#7a7a7a", "s", "none", -0.1),
@@ -248,7 +248,7 @@ def fig_rtt(panels, out):
                 for c in x.index:
                     sizes.setdefault(c, x.loc[c, "flight"])
             seen |= set(x.index)
-            ax.plot(x.extra.clip(lower=0), [RTT_CHAINS.index(c) + dy for c in x.index],
+            ax.plot(x.extra, [RTT_CHAINS.index(c) + dy for c in x.index],
                     linestyle="none", marker=mk, markersize=4.5, markerfacecolor=fill,
                     markeredgewidth=1.0, color=col, label=name)
         for c in RTT_CHAINS:
@@ -281,7 +281,7 @@ def fig_rtt(panels, out):
     fig.legend([handles[l] for l in order], order, loc="upper center", ncol=2, frameon=False,
                bbox_to_anchor=(0.5, 1.0), handletextpad=0.3, columnspacing=1.5)
     fig.tight_layout(rect=(0, 0.035, 1, 0.86))
-    fig.supxlabel("Excess TTFB in RTT units = (TTFB \u2212 TTFB at 0 ms) / RTT \u2212 3", fontsize=9,
+    fig.supxlabel("Excess TTFB in RTT units = (TTFB \u2212 TTFB at 0 ms) / measured RTT \u2212 3", fontsize=9,
                   x=(axes[0].get_position().x0 + axes[-1].get_position().x1) / 2, y=0.01)
     fig.savefig(out)
     plt.close(fig)
@@ -394,8 +394,8 @@ def main():
          "auth": "mutual", "delay": 600,
          "series": [("stock", "h743/20261010-h743-fpu-rtt0", "h743/20261010-h743-fpu-rtt{}"),
                     ("iw10", "h743/20261010-h743-fpu-iw10-rtt0", "h743/20261010-h743-fpu-iw10-rtt{}"),
-                    ("rto", "h743/20261010-h743-fpu-iw10-rtt0",
-                     "h743/20261010-h743-fpu-iw10-rto1000-rtt{}"), pi3]},
+                    ("rto", "h743/20261011-h743-fpu-iw10-rto1000-rtt0",
+                     "h743/20261011-h743-fpu-iw10-rto1000-rtt{}"), pi3]},
     ]
     for pan in panels:
         pan["series"] = [(k, b, r.format(pan["delay"])) for k, b, r in pan["series"]]
