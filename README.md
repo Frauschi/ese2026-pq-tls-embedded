@@ -143,6 +143,8 @@ Every run directory has `meta.txt` (DUT HELLO line, git revisions, options) and 
 | `dut_stack` | Deepest stack use below the entry frame of a fresh thread that runs one whole connection. |
 | `c2s_bytes`, `s2c_bytes` | TLS bytes on the wire, including records and close_notify, excluding TCP/IP headers. |
 
+The RW612 image reserves about 305 kB of RAM statically, 197 kB of it for 2 × 64 network buffers of 1,536 B (not minimized); the heap gets the rest. RW612 timings shift by up to 30% between differently linked images, because the code runs from external flash through a cache, so compare RW612 builds only within one image.
+
 `./scripts/view.sh` serves a browser viewer for `results/` at `http://127.0.0.1:8000/tools/viewer/`.
 
 ## License and citation
