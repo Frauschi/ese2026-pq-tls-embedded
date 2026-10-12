@@ -122,7 +122,7 @@ Stock Zephyr TCP starts with a congestion window of one segment and a slow-start
 
 `campaigns/20261010/build-all.sh` builds every image; `run-rw612.sh`, `run-h743.sh` and `run-pi.sh rpi3|rpi5` then measure one board each in parallel, and `run-h743-rto.sh` adds the 1 s RTO image. `run-rerun.sh` repeated runs from a first pass that had pinned `ese_host` with `taskset`. `campaigns/20261011-baselines/` measures the matching 0 ms baselines, and `campaigns/20261011-traces/` records the packet captures with `tcpdump`, which needs `cap_net_raw` and `cap_net_admin`. The scripts expect `west` on the `PATH` or in `$WEST` and the SDK in `$ZEPHYR_SDK_INSTALL_DIR`.
 
-`scripts/pcap_flights.py <pcap> --dut <ip> [--mss <B>]` counts rounds and retransmissions in a capture. tcpdump sees the DUT's packets before netem delays them. The host's GRO merges consecutive DUT segments into one frame, which `--mss` splits again (1460 for Zephyr, 1448 for Linux with TCP timestamps).
+`scripts/pcap_flights.py <pcap> --dut <ip> [--mss <B>]` counts rounds and retransmissions in a capture. tcpdump sees the DUT's packets before netem delays them, and the timestamps are those of this capture point. The host's GRO merges consecutive DUT segments into one frame; `--mss` reconstructs the segment count as ceil(frame payload / MSS), assuming all merged segments but the last are full (1460 for Zephyr, 1448 for Linux with TCP timestamps).
 
 ## Output
 

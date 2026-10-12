@@ -38,7 +38,8 @@ def main():
     ap.add_argument("--gap-ms", type=float, default=20.0,
                     help="a pause longer than this starts a new round")
     ap.add_argument("--mss", type=int,
-                    help="count DUT frames larger than this as several segments (host GRO)")
+                    help="reconstruct DUT segment counts from GRO-merged frames as "
+                         "ceil(payload / MSS), assuming all merged segments but the last are full")
     a = ap.parse_args()
     conns = defaultdict(list)
     for p in packets(a.pcap):
