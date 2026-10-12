@@ -124,7 +124,7 @@ P99_ROW = ("Sign", "ML-DSA-44, 99th percentile")
 def fig_ops(runs, out):
     meds = {p: load_alg(r) for p, r in runs.items()}
     p99 = {p: load_alg(r, 0.99) for p, r in runs.items()}
-    fig, ax = plt.subplots(figsize=(WIDTH_IN, 4.3))
+    fig, ax = plt.subplots(figsize=(WIDTH_IN, 3.85))
     y = 0
     ys, labels, heads = [], [], []
     last = None
@@ -156,16 +156,16 @@ def fig_ops(runs, out):
     ax.grid(axis="x", which="major", color=GRID, linewidth=0.5)
     ax.tick_params(axis="y", length=0)
     clean(ax)
-    fig.legend(loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=False,
-               handletextpad=0.3, columnspacing=1.5)
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.legend(loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=4, frameon=False,
+               handletextpad=0.3, columnspacing=1.2)
+    fig.tight_layout(rect=(0, 0, 1, 0.945))
     fig.savefig(out)
     plt.close(fig)
 
 
 def fig_handshake(runs, out):
     """Client and server TTFB per platform joined by a line, so the length shows what signing costs."""
-    fig, ax = plt.subplots(figsize=(WIDTH_IN, 3.6))
+    fig, ax = plt.subplots(figsize=(WIDTH_IN, 3.2))
     offs = [0.27, 0.09, -0.09, -0.27]
     for i, (p, name) in enumerate(PLATFORMS):
         if p not in runs:
@@ -201,7 +201,7 @@ def fig_handshake(runs, out):
     l += ["device as client: verifies, host signs", "device as server: signs"]
     fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0),
                handletextpad=0.3, columnspacing=1.2)
-    fig.tight_layout(rect=(0, 0, 1, 0.88))
+    fig.tight_layout(rect=(0, 0, 1, 0.865))
     fig.savefig(out)
     plt.close(fig)
 
@@ -302,11 +302,19 @@ HEAP_PHASES = {
 }
 
 
+def _mark_cv_received(evs):
+    i = next(i for i, e in enumerate(evs) if e[1] == "end" and e[4] == "DoTls13Certificate")
+    j = next(j for j in range(i + 1, len(evs)) if evs[j][1] == "alloc")
+    return evs[:j] + [(evs[j][0], "mark", 0, evs[j - 1][3], "cv_received")] + evs[j:]
+
+
 def fig_heap(run, specs, out):
     ht = _heap_trace_module()
     series = []
     for chain, label in specs:
         _, evs, _ = ht.load(f"{os.path.join(RES, run)}:{chain}")
+        # The frees after DoTls13Certificate release the received chain; CertificateVerify arrives next.
+        evs = _mark_cv_received(evs)
         series.append([label, evs, list(range(len(evs)))])
     ht.align_shared(series)
     fig, ax = plt.subplots(figsize=(WIDTH_IN, 3.2))
@@ -317,7 +325,7 @@ def fig_heap(run, specs, out):
     for x, e in zip(ref_xs, ref_evs):
         if e[1] == "end" and e[4] == "DoTls13CertificateRequest":
             opened["ProcessPeerCerts"] = x
-        if e[1] == "end" and e[4] == "DoTls13Certificate":
+        if e[1] == "mark" and e[4] == "cv_received":
             opened["DoTls13CertificateVerify"] = x
         if e[4] in HEAP_PHASES:
             if e[1] == "mark":
@@ -349,13 +357,7 @@ def fig_heap(run, specs, out):
     peaks.sort()
     ylim = ymax * 1.04
     gap = 0.155 * ylim
-    yls = [pk for pk, _, _, _ in peaks]
-    for _ in range(200):
-        for j in range(1, len(yls)):
-            d = gap - (yls[j] - yls[j - 1])
-            if d > 0:
-                yls[j] += d / 2
-                yls[j - 1] -= d / 2
+    yls = [peaks[0][0] + j * gap for j in range(len(peaks))]
     side = mtrans.blended_transform_factory(ax.transAxes, ax.transData)
     for (pk, label, col, ctx), yl in zip(peaks, yls):
         ax.plot([1.006, 1.03], [yl, yl], transform=side, color=col, linewidth=1.6, clip_on=False)
