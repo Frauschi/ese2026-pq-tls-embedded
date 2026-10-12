@@ -240,7 +240,34 @@ def main():
                 (ml + 3 * (4627 - 2420) + 2 * (2592 - 1312) + 2 * 91 + 3 * 72) / 1000))
     out.append(("ML-DSA-65 flight estimate [kB] (pk 1,952, sig 3,309 B)",
                 (ml + 3 * (3309 - 2420) + 2 * (1952 - 1312)) / 1000))
+    out.append(("ML-DSA-87 flight estimate [kB]",
+                (ml + 3 * (4627 - 2420) + 2 * (2592 - 1312)) / 1000))
     out.append(("P-256 hybrid chain adds per level [kB] (SPKI 91 + sig 72)", 0.163))
+    out.append(("flight transmission at 1 Mbit/s [s]: ML-DSA-44, SLH-DSA-128f",
+                (fl["mldsa44"] * 8 / 1e6, fl["slhdsa_sha2_128f"] * 8 / 1e6)))
+
+    out.append(("ML-DSA-44 sign p99 / median per board", {
+        p: q(A[p], "mldsa44", "sign", 0.99) / q(A[p], "mldsa44", "sign") for p in A}))
+    for name, base, run in (("rw612 stock", "rw612/20261010-rw612-rtt0", "rw612/20261010-rw612-rtt10"),
+                            ("h743 stock", "h743/20261010-h743-fpu-rtt0", "h743/20261010-h743-fpu-rtt10"),
+                            ("h743 iw10", "h743/20261010-h743-fpu-iw10-rtt0",
+                             "h743/20261010-h743-fpu-iw10-rtt10")):
+        x = extra_rtts(base, run).loc[("mldsa44", "server", "server")]
+        out.append((f"10 ms ML-DSA-44 server {name}: TTFB [ms], excess RTT", (x.ttfb, x.extra)))
+
+    for p in ("rw612", "h743"):
+        d = alg(f"{p}/20261005-alg-profiles")
+        d = d[d.variant == "smallmem"]
+        out.append((f"{p} higher categories / lower, smallmem 20261005 profile run", {
+            "mldsa65 sign": q(d, "mldsa65", "sign") / q(d, "mldsa44", "sign"),
+            "mldsa87 sign": q(d, "mldsa87", "sign") / q(d, "mldsa44", "sign"),
+            "mldsa65 verify": q(d, "mldsa65", "verify") / q(d, "mldsa44", "verify"),
+            "mldsa87 verify": q(d, "mldsa87", "verify") / q(d, "mldsa44", "verify"),
+            "mlkem1024 encap": q(d, "mlkem1024", "encap") / q(d, "mlkem768", "encap"),
+            "mlkem1024 keygen+decap": (q(d, "mlkem1024", "keygen") + q(d, "mlkem1024", "decap"))
+            / (q(d, "mlkem768", "keygen") + q(d, "mlkem768", "decap")),
+            "slh 192f sign": q(d, "slhdsa_sha2_192f", "sign") / q(d, "slhdsa_sha2_128f", "sign"),
+            "slh 256f sign": q(d, "slhdsa_sha2_256f", "sign") / q(d, "slhdsa_sha2_128f", "sign")}))
     for k, v in out:
         if isinstance(v, dict):
             v = {a: (round(b, 2) if isinstance(b, float) else b) for a, b in v.items()}

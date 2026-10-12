@@ -6,7 +6,7 @@ The framework measures wolfSSL's post-quantum algorithms on embedded systems: ra
 
 ## Reproducing the paper
 
-`results/<board>/` holds every run the paper uses: `20261010-*` from the main campaign, `20261011-trace-*` with the packet captures, and the other `20261011-*` runs, which add matching 0 ms baselines: the Pi 5 with grouped host messages, and the H743 1 s RTO image at 0, 100 and 600 ms, which replaces the `20261010` RTO runs. Each run's `meta.txt` records the DUT image, revisions and options. With Python 3, pandas, NumPy and Matplotlib:
+`results/<board>/` holds every run the paper uses: `20261010-*` from the main campaign, `20261011-trace-*` with the packet captures, and the other `20261011-*` runs, which add matching 0 ms baselines: the Pi 5 with grouped host messages, and the H743 1 s RTO image at 0, 100 and 600 ms, which replaces the `20261010` RTO runs. `20261005-alg-profiles` on the RW612 and H743 is an earlier profile run with older wolfSSL and framework revisions; the paper uses it only for the cost ratios of the category 3 and 5 parameter sets. Each run's `meta.txt` records the DUT image, revisions and options. With Python 3, pandas, NumPy and Matplotlib:
 
 ```sh
 python3 paper/figures.py                      # paper/out/fig1_ops.png ... fig4_heap.png

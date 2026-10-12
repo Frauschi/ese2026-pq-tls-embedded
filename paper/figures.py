@@ -113,11 +113,12 @@ OPS = [
     ("Sign", "ECDSA P-256", [("ecdsa_p256", "sign")]),
     ("Sign", "RSA-3072", [("rsa3072", "sign")]),
     ("Sign", "ML-DSA-44", [("mldsa44", "sign")]),
+    ("Sign", "ML-DSA-44, 99th percentile", [("mldsa44", "sign")]),
     ("Sign", "Falcon-512", [("falcon512", "sign")]),
     ("Sign", "SLH-DSA-128s", [("slhdsa_sha2_128s", "sign")]),
     ("Sign", "SLH-DSA-128f", [("slhdsa_sha2_128f", "sign")]),
 ]
-P99_ROW = ("Sign", "ML-DSA-44")
+P99_ROW = ("Sign", "ML-DSA-44, 99th percentile")
 
 
 def fig_ops(runs, out):
@@ -140,15 +141,10 @@ def fig_ops(runs, out):
     for i, (p, name) in enumerate(PLATFORMS):
         if p not in meds:
             continue
-        xs = [sum(meds[p].get(op, np.nan) for op in ops) for _, _, ops in OPS]
+        xs = [sum((p99 if (grp, label) == P99_ROW else meds)[p].get(op, np.nan) for op in ops)
+              for grp, label, ops in OPS]
         ax.plot(xs, ys, linestyle="none", marker=MARKERS[i], markersize=5,
                 markerfacecolor="none", markeredgewidth=1.1, color=COLORS[i], label=name)
-        for (grp, label, ops), yy, x in zip(OPS, ys, xs):
-            if (grp, label) == P99_ROW and p == "rw612":
-                hi = p99[p][ops[0]]
-                ax.plot([x * 1.12, hi], [yy, yy], color=COLORS[i], linewidth=0.8)
-                ax.plot([hi], [yy], marker="|", markersize=6, markeredgewidth=1.0, color=COLORS[i])
-                ax.text(hi * 1.4, yy, "99th percentile", va="center", fontsize=8, color=INK2)
     for yy in ys:
         ax.axhline(yy, color=GRID, linewidth=0.4, zorder=0)
     time_axis(ax, 0.01, 1e5)
@@ -156,7 +152,7 @@ def fig_ops(runs, out):
     for yh, grp in heads:
         ax.text(0.0105, yh, grp, fontweight="bold", va="center", ha="left", color=INK)
     ax.set_ylim(y, -1)
-    ax.set_xlabel("Median time per operation, logarithmic")
+    ax.set_xlabel("Time per operation (median unless noted), logarithmic")
     ax.grid(axis="x", which="major", color=GRID, linewidth=0.5)
     ax.tick_params(axis="y", length=0)
     clean(ax)
@@ -170,7 +166,7 @@ def fig_ops(runs, out):
 def fig_handshake(runs, out):
     """Client and server TTFB per platform joined by a line, so the length shows what signing costs."""
     fig, ax = plt.subplots(figsize=(WIDTH_IN, 3.6))
-    offs = [-0.27, -0.09, 0.09, 0.27]
+    offs = [0.27, 0.09, -0.09, -0.27]
     for i, (p, name) in enumerate(PLATFORMS):
         if p not in runs:
             continue
@@ -227,9 +223,9 @@ RTT_CHAINS = ["ecdsa_p256", "rsa3072", "falcon512", "lms+mldsa44", "mldsa44",
               "lms+slhdsa_sha2_128f", "slhdsa_sha2_128f"]
 RTT_LIMITS = [(4.5, "\u2193 > 14.6 kB (10 \u00d7 MSS)"), (5.5, "\u2193 > 32 KiB send window")]
 TCP_STYLE = {
-    "stock": ("Zephyr TCP, stock (initial window 1 segment)", INK, "o", "none", -0.3),
-    "iw10": ("Zephyr TCP, initial window 10 segments", "#7a7a7a", "s", "none", -0.1),
-    "rto": ("Zephyr TCP, initial window 10, RTO 1 s", INK, "s", INK, 0.1),
+    "stock": ("Zephyr TCP, stock (initial window 1 segment)", "#d0402f", "o", "none", -0.3),
+    "iw10": ("Zephyr TCP, initial window 10 segments", "#8a7ae0", "s", "none", -0.1),
+    "rto": ("Zephyr TCP, initial window 10, RTO 1 s", "#4a3aa7", "s", "#4a3aa7", 0.1),
     "linux": ("Linux TCP (Pi 3B+)", COLORS[2], "^", "none", 0.3),
 }
 
@@ -321,6 +317,8 @@ def fig_heap(run, specs, out):
     for x, e in zip(ref_xs, ref_evs):
         if e[1] == "end" and e[4] == "DoTls13CertificateRequest":
             opened["ProcessPeerCerts"] = x
+        if e[1] == "end" and e[4] == "DoTls13Certificate":
+            opened["DoTls13CertificateVerify"] = x
         if e[4] in HEAP_PHASES:
             if e[1] == "mark":
                 opened.setdefault(e[4], x)
@@ -360,8 +358,7 @@ def fig_heap(run, specs, out):
                 yls[j - 1] -= d / 2
     side = mtrans.blended_transform_factory(ax.transAxes, ax.transData)
     for (pk, label, col, ctx), yl in zip(peaks, yls):
-        ax.plot([1.0, 1.012, 1.03], [pk, pk, yl], transform=side, color=col, linewidth=1.4,
-                clip_on=False, solid_joinstyle="round")
+        ax.plot([1.006, 1.03], [yl, yl], transform=side, color=col, linewidth=1.6, clip_on=False)
         ax.text(1.036, yl, f"{label}\n{pk:.0f} kB peak\n({pk - ctx:.0f} kB + context)",
                 transform=side, va="center", ha="left", fontsize=8, color=INK, linespacing=1.05)
     ax.set_ylim(0, ylim)
